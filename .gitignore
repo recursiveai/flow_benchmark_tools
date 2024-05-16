@@ -9,3 +9,9 @@ env
 venv
 .env
 .venv
+
+# Testing
+.coverage
+
+# Distribution / packaging
+*.egg-info/

@@ -1,0 +1,42 @@
+[build-system]
+requires = ["setuptools>=69", "setuptools-scm>=8"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "recursiveai-benchmark-lab"
+version = "0.1.0"
+description = "A library containing LLM benchmarking tools"
+requires-python=">=3.11,<3.12"
+dependencies= [ ]
+dynamic = ["optional-dependencies"]
+
+[tool.setuptools.packages.find]
+where = ["src"]
+include = ["recursiveai*"]
+namespaces = true
+
+[tool.setuptools.dynamic.optional-dependencies]
+core = {file = ["requirements.txt"]}
+dev = {file = ["requirements-dev.txt"]}
+
+[tool.pytest.ini_options]
+addopts = "-ra -q -vv --cov=recursiveai"
+testpaths = ["src/tests"]
+
+[tool.pylint.MASTER]
+disable = ["C0114", "C0115", "C0116"]
+extension-pkg-allow-list = "pydantic"
+generated-members = ["numpy.*", "torch.*"]
+
+[tool.bandit]
+exclude_dirs = ["src/tests"]
+
+[tool.black]
+line-length = 88
+
+[tool.isort]
+profile = "black"
+
+[tool.pyright]
+include = ["src"]
+stubPath = ""
