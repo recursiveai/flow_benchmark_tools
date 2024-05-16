@@ -24,12 +24,11 @@ repos:
         language: system
         types: [python]
         args: ["src"]
-      # TODO: enable when tests are added
-      # - id: pytest
-      #   name: pytest
-      #   entry: pytest
-      #   language: system
-      #   types: [python]
-      #   pass_filenames: false
-      #   always_run: true
-      #   args: ["src/tests"]
+      - id: pytest
+        name: pytest
+        entry: pytest
+        language: system
+        types: [python]
+        pass_filenames: false
+        always_run: true
+        args: ["src/tests"]
