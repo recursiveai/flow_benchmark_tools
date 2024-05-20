@@ -1,9 +1,10 @@
+from dataclasses import dataclass
+
 from .benchmark import Benchmark
 from .benchmark_agent import BenchmarkAgent
 
 
+@dataclass
 class BenchmarkRun:
-
-    def __init__(self, agent: BenchmarkAgent, benchmarks: list[Benchmark]) -> None:
-        self.agent = agent
-        self.benchmarks = benchmarks
+    agent: BenchmarkAgent
+    benchmarks: list[Benchmark]

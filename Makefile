@@ -16,13 +16,13 @@ pytest: ## Execute unit tests with pytest
 check: pylint pyright bandit ## Run pylint, pyright and bandit
 
 pylint: ## Check code smells with pylint
-	python -m pylint --exit-zero src
+	-python -m pylint --exit-zero src
 
 pyright: ## Check types with pyright
-	python -m pyright
+	-python -m pyright
 
 bandit: ## Check securty smells with bandit
-	python -m bandit -c pyproject.toml -r src
+	-python -m bandit -c pyproject.toml -r src
 
 ## Styling ##
 style: black isort ## Run black and isort

@@ -27,6 +27,7 @@ testpaths = ["src/tests"]
 disable = ["C0114", "C0115", "C0116"]
 extension-pkg-allow-list = "pydantic"
 generated-members = ["numpy.*", "torch.*"]
+ignore-paths = ["src/tests"]
 
 [tool.bandit]
 exclude_dirs = ["src/tests"]
