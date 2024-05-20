@@ -14,3 +14,7 @@ class BenchmarkAgent(ABC):
     @abstractmethod
     async def run_benchmark(self, benchmark: Benchmark) -> BenchmarkResponse:
         raise NotImplementedError()
+
+    @property
+    def name(self) -> str:
+        return self.__class__.__name__
