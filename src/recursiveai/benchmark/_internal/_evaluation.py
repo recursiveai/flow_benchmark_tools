@@ -9,7 +9,7 @@ class Evaluation(BaseModel):
     query: str
     reference_answer: str
     test_answer: str
-    evaluation: str
+    evaluation: str | None
     rating: int | None = None
     rating_min: int = 0
     rating_max: int = 10

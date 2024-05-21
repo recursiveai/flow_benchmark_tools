@@ -1,8 +1,18 @@
+from unittest.mock import AsyncMock, Mock
+
 import pytest
 
 from recursiveai.benchmark._internal._evaluation import Evaluation
-from recursiveai.benchmark._internal._evaluators._happy_evaluator import HappyEvaluator
+from recursiveai.benchmark._internal._evaluators._happy import HappyEvaluator
+from recursiveai.benchmark._internal._evaluators._llm_judge import LLMJudgeEvaluator
 from recursiveai.benchmark.api.benchmark_evaluator import Evaluator, get_evaluator
+
+
+@pytest.fixture
+def model_mock():
+    model = Mock()
+    model.name = "mock"
+    return model
 
 
 def test_valid_rating(sample_evaluation):
@@ -47,11 +57,53 @@ async def test_happy_evaluator():
     assert evaluation.evaluator == evaluator.name
 
 
-def test_get_default_evaluator():
-    evaluator = get_evaluator("")
-    assert isinstance(evaluator, HappyEvaluator)
-
-
 def test_get_happy_evaluator():
     evaluator = get_evaluator(Evaluator.HAPPY)
     assert isinstance(evaluator, HappyEvaluator)
+
+
+def test_get_gpt_3_5_turbo_evaluator():
+    evaluator = get_evaluator(Evaluator.LLM_JUDGE_GPT_3_5_TURBO)
+    assert isinstance(evaluator, LLMJudgeEvaluator)
+    assert evaluator._model.name == "gpt-3.5-turbo"
+
+
+def test_get_gpt_4_turbo_preview_evaluator():
+    evaluator = get_evaluator(Evaluator.LLM_JUDGE_GPT_4_TURBO_PREVIEW)
+    assert isinstance(evaluator, LLMJudgeEvaluator)
+    assert evaluator._model.name == "gpt-4-turbo-preview"
+
+
+def test_get_gpt_4_o_evaluator():
+    evaluator = get_evaluator(Evaluator.LLM_JUDGE_GPT_4_0)
+    assert isinstance(evaluator, LLMJudgeEvaluator)
+    assert evaluator._model.name == "gpt-4o"
+
+
+@pytest.mark.asyncio
+async def test_llm_judge_evaluate_success(model_mock):
+    mock_evaluation = "Rating: [[5]]"
+    model_mock.async_chat_completion = AsyncMock(return_value=mock_evaluation)
+    evaluator = LLMJudgeEvaluator(model=model_mock)
+    evaluation = await evaluator.evaluate(query="", reference_answer="", test_answer="")
+    assert evaluation.rating == 5
+    assert evaluation.evaluation == mock_evaluation
+
+
+@pytest.mark.asyncio
+async def test_llm_judge_evaluate_no_rating(model_mock):
+    mock_evaluation = "No rating"
+    model_mock.async_chat_completion = AsyncMock(return_value=mock_evaluation)
+    evaluator = LLMJudgeEvaluator(model=model_mock)
+    evaluation = await evaluator.evaluate(query="", reference_answer="", test_answer="")
+    assert evaluation.rating == None
+    assert evaluation.evaluation == mock_evaluation
+
+
+@pytest.mark.asyncio
+async def test_llm_judge_evaluate_none(model_mock):
+    model_mock.async_chat_completion = AsyncMock(return_value=None)
+    evaluator = LLMJudgeEvaluator(model=model_mock)
+    evaluation = await evaluator.evaluate(query="", reference_answer="", test_answer="")
+    assert evaluation.rating == None
+    assert evaluation.evaluation == None

@@ -6,7 +6,7 @@ import os
 
 from .._internal._benchmark_evaluator import BenchmarkEvaluator
 from .._internal._benchmark_output import BenchmarkOutput
-from .._internal._evaluators._happy_evaluator import HappyEvaluator
+from .._internal._evaluators._happy import HappyEvaluator
 from .._internal._run_output import RunOutput
 from .benchmark_run import BenchmarkRun
 from .exit_code import ExitCode
@@ -89,7 +89,7 @@ class BenchmarkRunner:
 
         full_path = os.path.join(folder, filename)
         with open(full_path, "w") as f:
-            results = [result.model_dump() for result in results]
-            json.dump(results, f, ensure_ascii=False, indent=4)
+            dumps = [result.model_dump() for result in results]
+            json.dump(dumps, f, ensure_ascii=False, indent=4)
 
         _logger.info(f"Run results saved to {full_path}")
