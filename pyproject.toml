@@ -6,7 +6,8 @@ build-backend = "setuptools.build_meta"
 name = "recursiveai-benchmark-lab"
 version = "0.1.0"
 description = "A library containing LLM benchmarking tools"
-requires-python=">=3.11,<3.12"
+readme = "README.md"
+requires-python=">=3.10,<3.12"
 dependencies= [ ]
 dynamic = ["optional-dependencies"]
 
@@ -18,6 +19,7 @@ namespaces = true
 [tool.setuptools.dynamic.optional-dependencies]
 core = {file = ["requirements.txt"]}
 dev = {file = ["requirements-dev.txt"]}
+pub = {file = ["requirements-pub.txt"]}
 
 [tool.pytest.ini_options]
 addopts = "-ra -q -vv --cov=recursiveai"
