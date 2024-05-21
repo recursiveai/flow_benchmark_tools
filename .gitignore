@@ -15,6 +15,7 @@ venv
 
 # Distribution / packaging
 *.egg-info/
+dist
 
 # Python-specific
 __pycache__/

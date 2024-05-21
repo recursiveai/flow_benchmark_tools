@@ -1,8 +1,9 @@
 .DEFAULT_GOAL := help
-.PHONY: install pre-commit pytest check pylint pyright bandit style black isort help
+.PHONY: install pre-commit pytest check pylint pyright bandit style black isort build publish help
+TARGET_REPO := https://asia-python.pkg.dev/recursive-research-core/recursive-common-pypi/
 
 install: ## Install/Upgrade all dependencies in editable mode
-	pip install --upgrade -e '.[core,dev]'
+	pip install --upgrade -e '.[core,dev,pub]'
 
 pre-commit: ## Install pre-commit
 	pre-commit install
@@ -32,6 +33,14 @@ black: ## Auto-format python code using black
 
 isort: ## Auto-format python code using isort
 	python -m isort src
+
+build: ## Build package into dist folder and check artifacts
+	rm -f dist/*
+	python -m build .
+	python -m twine check dist/*
+
+publish: ## Publish artifacts to private pypi repository
+	python -m twine upload --repository-url $(TARGET_REPO) dist/*
 
 help: # Run `make help` to get help on the make commands
 	@echo "\033[36mAvailable commands:\033[0m"
