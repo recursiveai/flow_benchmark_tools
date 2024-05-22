@@ -4,10 +4,10 @@ import json
 import logging
 import os
 
-from .._internal._benchmark_evaluator import BenchmarkEvaluator
 from .._internal._benchmark_output import BenchmarkOutput
-from .._internal._evaluators._happy import HappyEvaluator
+from .._internal._evaluators import get_evaluator
 from .._internal._run_output import RunOutput
+from .benchmark_evaluator import Evaluator
 from .benchmark_run import BenchmarkRun
 from .exit_code import ExitCode
 
@@ -21,18 +21,19 @@ _DEFAULT_RESULTS_FOLDER = "benchmark/results/"
 class BenchmarkRunner:
     def __init__(
         self,
-        runs: list[BenchmarkRun],
-        evaluator: BenchmarkEvaluator = HappyEvaluator(),
+        runs: list[BenchmarkRun] | BenchmarkRun,
+        evaluator: Evaluator = Evaluator.LLM_JUDGE_GPT_4_TURBO_PREVIEW,
         results_folder=_DEFAULT_RESULTS_FOLDER,
         results_file="",
-        store_remotely: bool = False,
         repeats: int = 1,
     ) -> None:
-        self._runs = runs
-        self._evaluator = evaluator
+        if isinstance(runs, list):
+            self._runs = runs
+        else:
+            self._runs = [runs]
+        self._evaluator = get_evaluator(evaluator=evaluator)
         self._results_folder = results_folder
         self._results_file = results_file
-        self._store_remotely = store_remotely
         if repeats < 1:
             self._repeats = 1
         elif repeats > _MAX_NUM_REPEATS:
@@ -50,9 +51,13 @@ class BenchmarkRunner:
     async def _execute_run(self, run: BenchmarkRun) -> RunOutput:
         date = datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
         outputs = []
-        for benchmark in run.benchmarks:
+        for idx, benchmark in enumerate(run.benchmarks):
+            _logger.info(
+                f"Benchmark {idx+1} of {len(run.benchmarks)}: agent={run.agent.name} benchmark={benchmark}"
+            )
             evaluations = []
-            for _ in range(self._repeats):
+            for repeat in range(self._repeats):
+                _logger.info(f"Repeat {repeat+1} of {self._repeats}")
                 response = await run.agent.run_benchmark(benchmark)
                 if response.exit_code == ExitCode.SUCCESS:
                     evaluation = await self._evaluator.evaluate(
@@ -88,8 +93,7 @@ class BenchmarkRunner:
         os.makedirs(folder, exist_ok=True)
 
         full_path = os.path.join(folder, filename)
+        _logger.info(f"Saving results to {full_path}")
         with open(full_path, "w") as f:
-            dumps = [result.model_dump() for result in results]
+            dumps = {"runs": [result.model_dump() for result in results]}
             json.dump(dumps, f, ensure_ascii=False, indent=4)
-
-        _logger.info(f"Run results saved to {full_path}")

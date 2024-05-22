@@ -3,9 +3,10 @@ from unittest.mock import AsyncMock, Mock
 import pytest
 
 from recursiveai.benchmark._internal._evaluation import Evaluation
+from recursiveai.benchmark._internal._evaluators import get_evaluator
 from recursiveai.benchmark._internal._evaluators._happy import HappyEvaluator
 from recursiveai.benchmark._internal._evaluators._llm_judge import LLMJudgeEvaluator
-from recursiveai.benchmark.api.benchmark_evaluator import Evaluator, get_evaluator
+from recursiveai.benchmark.api.benchmark_evaluator import Evaluator
 
 
 @pytest.fixture

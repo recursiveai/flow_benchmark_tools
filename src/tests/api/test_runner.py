@@ -1,12 +1,15 @@
 import datetime
 import json
 import os
+from unittest.mock import Mock
 
 import pytest
 
+from recursiveai.benchmark._internal._benchmark_evaluator import BenchmarkEvaluator
 from recursiveai.benchmark._internal._benchmark_output import BenchmarkOutput
 from recursiveai.benchmark._internal._run_output import RunOutput
 from recursiveai.benchmark.api import BenchmarkRunner
+from recursiveai.benchmark.api.benchmark_evaluator import Evaluator
 from recursiveai.benchmark.api.benchmark_runner import _MAX_NUM_REPEATS
 
 
@@ -63,7 +66,7 @@ def test_save_runs_to_json(run_outputs):
 
 @pytest.mark.asyncio
 async def test_execute_run(benchmark_run, callback_agent, benchmark_list):
-    runner = BenchmarkRunner(runs=[])
+    runner = BenchmarkRunner(runs=[], evaluator=Evaluator.HAPPY)
     result = await runner._execute_run(run=benchmark_run)
 
     assert result.agent_name == callback_agent.name
@@ -81,3 +84,15 @@ def test_negative_repeats():
 def test_exceed_max_repeats():
     runner = BenchmarkRunner(runs=[], repeats=1000)
     assert runner._repeats == _MAX_NUM_REPEATS
+
+
+def test_single_run():
+    mock_run = Mock()
+    runner = BenchmarkRunner(runs=mock_run)
+    assert type(runner._runs) is list
+    assert runner._runs == [mock_run]
+
+
+def test_evaluator_type():
+    runner = BenchmarkRunner(runs=[], evaluator=Evaluator.HAPPY)
+    assert isinstance(runner._evaluator, BenchmarkEvaluator)

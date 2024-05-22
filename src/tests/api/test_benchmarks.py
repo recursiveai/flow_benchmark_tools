@@ -1,11 +1,15 @@
 import errno
 import json
 import os
+from unittest.mock import Mock
 
 import pytest
 
-from recursiveai.benchmark.api import Benchmark
-from recursiveai.benchmark.api.util import read_benchmarks_from_jsonl
+from recursiveai.benchmark.api import Benchmark, BenchmarkRun
+from recursiveai.benchmark.api.util import (
+    create_run_from_benchmark_jsonl,
+    read_benchmarks_from_jsonl,
+)
 
 _TEST_REFERENCE_ANSWER_FILE = "test_reference_answer.txt"
 _TEST_REFERENCE_ANSWER = "This is a reference answer"
@@ -81,6 +85,20 @@ def test_read_jsonl_from_file(benchmark_jsons, benchmark_jsonl):
     assert len(benchmarks) == len(benchmark_jsons)
 
     for idx, benchmark in enumerate(benchmarks):
+        assert (
+            benchmark.model_dump(exclude_none=True, exclude_unset=True)
+            == benchmark_jsons[idx]
+        )
+
+
+def test_create_run_from_benchmark_jsonl(benchmark_jsons, benchmark_jsonl):
+    run = create_run_from_benchmark_jsonl(
+        agent=Mock(), jsonl_file=_TEST_BENCHMARK_JSONL_FILE
+    )
+
+    assert isinstance(run, BenchmarkRun)
+    assert len(run.benchmarks) == len(benchmark_jsons)
+    for idx, benchmark in enumerate(run.benchmarks):
         assert (
             benchmark.model_dump(exclude_none=True, exclude_unset=True)
             == benchmark_jsons[idx]
