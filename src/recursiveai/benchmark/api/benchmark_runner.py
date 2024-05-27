@@ -38,7 +38,9 @@ class BenchmarkRunner:
             self._repeats = 1
         elif repeats > _MAX_NUM_REPEATS:
             _logger.warning(
-                f"Requested repeats:{repeats} exceeds maximum allowed:{_MAX_NUM_REPEATS}"
+                "Requested repeats:%s exceeds maximum allowed:%s",
+                repeats,
+                _MAX_NUM_REPEATS,
             )
             self._repeats = _MAX_NUM_REPEATS
         else:
@@ -53,11 +55,15 @@ class BenchmarkRunner:
         outputs = []
         for idx, benchmark in enumerate(run.benchmarks):
             _logger.info(
-                f"Benchmark {idx+1} of {len(run.benchmarks)}: agent={run.agent.name} benchmark={benchmark}"
+                "Benchmark %s of %s: agent=%s benchmark=%s",
+                idx + 1,
+                len(run.benchmarks),
+                run.agent.name,
+                benchmark,
             )
             evaluations = []
             for repeat in range(self._repeats):
-                _logger.info(f"Repeat {repeat+1} of {self._repeats}")
+                _logger.info("Repeat %s of %s", repeat + 1, self._repeats)
                 evaluation = None
                 try:
                     response = await run.agent.run_benchmark(benchmark)
@@ -69,7 +75,7 @@ class BenchmarkRunner:
                         )
                     else:
                         _logger.error(
-                            f"Benchmark exit_code is not SUCCESS: {response.exit_code}"
+                            "Benchmark exit_code is not SUCCESS: %s", response.exit_code
                         )
 
                 except Exception:
@@ -98,7 +104,7 @@ class BenchmarkRunner:
         os.makedirs(folder, exist_ok=True)
 
         full_path = os.path.join(folder, filename)
-        _logger.info(f"Saving results to {full_path}")
+        _logger.info("Saving results to %s", full_path)
         with open(full_path, "w") as f:
             dumps = {"runs": [result.model_dump() for result in results]}
             json.dump(dumps, f, ensure_ascii=False, indent=4)

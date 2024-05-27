@@ -74,6 +74,6 @@ class LLMJudgeEvaluator(BenchmarkEvaluator):
         if regex_match:
             rating = int(regex_match.groups()[0])
         else:
-            _logger.warning(f"Could not extract rating from evaluation:{evaluation}")
+            _logger.warning("Could not extract rating from evaluation:%s", evaluation)
             return None
         return rating

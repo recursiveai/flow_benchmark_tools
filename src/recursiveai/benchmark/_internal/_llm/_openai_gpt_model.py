@@ -22,7 +22,7 @@ class GPTX(LLMModel):
         try:
             self._encoding = encoding_for_model(name)
         except KeyError:
-            _logger.warning(f"Could not get encoding for model {name}")
+            _logger.warning("Could not get encoding for model %s", name)
             self._encoding = None
 
     @property

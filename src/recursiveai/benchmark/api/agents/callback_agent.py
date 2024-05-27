@@ -20,7 +20,7 @@ class CallbackAgent(BenchmarkAgent):
             exit_code = ExitCode.SUCCESS
         except Exception:
             _logger.exception(
-                f"Caught exception while running benchmark: {benchmark.query}"
+                "Caught exception while running benchmark: %s", benchmark.query
             )
             response = None
             exit_code = ExitCode.FAILED
