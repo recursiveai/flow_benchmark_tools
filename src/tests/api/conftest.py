@@ -29,13 +29,3 @@ def callback_function():
         return query
 
     return f
-
-
-@pytest.fixture
-def callback_agent(callback_function):
-    return CallbackAgent(callback=callback_function)
-
-
-@pytest.fixture
-def benchmark_run(callback_agent, benchmark_list):
-    return BenchmarkRun(agent=callback_agent, benchmarks=benchmark_list)

@@ -29,4 +29,4 @@ class Benchmark(BaseModel):
 class BenchmarkResponse(BaseModel):
     response: str | None = None
     extras: dict[str, Any] | None = None
-    exit_code: ExitCode
+    exit_code: ExitCode = ExitCode.SUCCESS

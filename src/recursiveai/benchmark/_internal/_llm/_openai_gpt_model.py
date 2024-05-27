@@ -75,9 +75,7 @@ class GPTX(LLMModel):
                 timeout=timeout,
             )
         except Exception:
-            _logger.error(
-                "Caught exception when running async_chat_completion", exc_info=1
-            )
+            _logger.exception("Caught exception when running async_chat_completion")
             return None
 
         return response.choices[0].message.content
@@ -110,8 +108,8 @@ class GPTX(LLMModel):
                 timeout=timeout,
             )
         except Exception:
-            _logger.error(
-                "Caught exception when running async_chat_completion_stream", exc_info=1
+            _logger.exception(
+                "Caught exception when running async_chat_completion_stream"
             )
             return None
 

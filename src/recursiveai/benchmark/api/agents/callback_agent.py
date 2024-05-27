@@ -18,10 +18,9 @@ class CallbackAgent(BenchmarkAgent):
         try:
             response = self._callback(benchmark.query)
             exit_code = ExitCode.SUCCESS
-        except:
-            _logger.error(
-                f"Caught exception while running benchmark: {benchmark.query}",
-                exc_info=1,
+        except Exception:
+            _logger.exception(
+                f"Caught exception while running benchmark: {benchmark.query}"
             )
             response = None
             exit_code = ExitCode.FAILED

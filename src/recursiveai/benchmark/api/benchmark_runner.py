@@ -58,18 +58,23 @@ class BenchmarkRunner:
             evaluations = []
             for repeat in range(self._repeats):
                 _logger.info(f"Repeat {repeat+1} of {self._repeats}")
-                response = await run.agent.run_benchmark(benchmark)
-                if response.exit_code == ExitCode.SUCCESS:
-                    evaluation = await self._evaluator.evaluate(
-                        query=benchmark.query,
-                        reference_answer=benchmark.reference_answer,
-                        test_answer=response.response,
-                    )
-                else:
-                    _logger.error(
-                        f"Benchmark exit_code is not SUCCESS: {response.exit_code}"
-                    )
-                    evaluation = None
+                evaluation = None
+                try:
+                    response = await run.agent.run_benchmark(benchmark)
+                    if response.exit_code == ExitCode.SUCCESS:
+                        evaluation = await self._evaluator.evaluate(
+                            query=benchmark.query,
+                            reference_answer=benchmark.reference_answer,
+                            test_answer=response.response,
+                        )
+                    else:
+                        _logger.error(
+                            f"Benchmark exit_code is not SUCCESS: {response.exit_code}"
+                        )
+
+                except Exception:
+                    _logger.exception("Caught exception while running benchmark")
+
                 evaluations.append(evaluation)
             outputs.append(
                 BenchmarkOutput(
