@@ -10,6 +10,11 @@ class RunMetrics(BaseModel):
     benchmark_metrics: list[BenchmarkMetrics] = Field(exclude=True)
 
     @computed_field
+    @property
+    def num_benchmarks(self) -> int:
+        return len(self.benchmark_metrics)
+
+    @computed_field
     @cached_property
     def ratings(self) -> list[float]:
         return [bm_m.mean_rating for bm_m in self.benchmark_metrics]
@@ -17,7 +22,26 @@ class RunMetrics(BaseModel):
     @computed_field
     @property
     def sorted_ratings(self) -> list[float]:
-        return sorted(self.ratings)
+        return [value for _, value in self.sorted_enumerated_ratings]
+
+    @computed_field
+    @cached_property
+    def sorted_enumerated_ratings(self) -> list[tuple[int, float]]:
+        return sorted(enumerate(self.ratings), key=lambda x: x[1])
+
+    @computed_field
+    @property
+    def histogram(self) -> dict[str, int]:
+        bins = [-0.5, 0.5, 4.5, 7.5, 10.5]
+        counts, _ = np.histogram(self.ratings, bins=bins)
+        if len(counts) == 4:
+            return {
+                "invalid": int(counts[0]),
+                "poor": int(counts[1]),
+                "fair": int(counts[2]),
+                "good": int(counts[3]),
+            }
+        return {}
 
     @computed_field
     @property

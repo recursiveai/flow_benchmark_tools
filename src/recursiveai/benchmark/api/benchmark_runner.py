@@ -84,7 +84,10 @@ class BenchmarkRunner:
                 evaluations.append(evaluation)
             outputs.append(
                 BenchmarkOutput(
-                    info=benchmark, repeats=self._repeats, evaluations=evaluations
+                    id=idx,
+                    info=benchmark,
+                    repeats=self._repeats,
+                    evaluations=evaluations,
                 )
             )
         return RunOutput(

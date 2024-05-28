@@ -21,8 +21,9 @@ from recursiveai.benchmark.api.benchmark_runner import _MAX_NUM_REPEATS
 @pytest.fixture
 def benchmark_outputs(benchmark_list, sample_evaluation):
     benchmark_outputs = []
-    for bm in benchmark_list:
+    for idx, bm in enumerate(benchmark_list):
         output = BenchmarkOutput(
+            id=idx,
             info=bm,
             repeats=2,
             evaluations=[

@@ -6,6 +6,7 @@ from ._metrics._benchmark_metrics import BenchmarkMetrics
 
 
 class BenchmarkOutput(BaseModel):
+    id: int
     info: Benchmark
     repeats: int = 1
     evaluations: list[Evaluation | None]

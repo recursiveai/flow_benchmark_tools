@@ -11,7 +11,7 @@ class Evaluation(BaseModel):
     test_answer: str
     evaluation: str | None
     rating: int | None = None
-    rating_min: int = 0
+    rating_min: int = 1
     rating_max: int = 10
     extras: dict[str, Any] | None = None
 
