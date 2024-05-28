@@ -2,6 +2,7 @@ from pydantic import BaseModel, computed_field
 
 from ..api.benchmark import Benchmark
 from ._evaluation import Evaluation
+from ._metrics._benchmark_metrics import BenchmarkMetrics
 
 
 class BenchmarkOutput(BaseModel):
@@ -11,9 +12,5 @@ class BenchmarkOutput(BaseModel):
 
     @computed_field
     @property
-    def average_rating(self) -> float:
-        valid_evals = list(filter(None, self.evaluations))
-        ratings = [eval.rating for eval in valid_evals if eval.rating is not None]
-        if not ratings:
-            return 0.0
-        return sum(ratings) / len(ratings)
+    def metrics(self) -> BenchmarkMetrics:
+        return BenchmarkMetrics(evals=self.evaluations)
