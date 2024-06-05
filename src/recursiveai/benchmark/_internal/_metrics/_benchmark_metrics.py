@@ -27,14 +27,14 @@ class BenchmarkMetrics(BaseModel):
 
     @computed_field
     @property
-    def mean_rating(self) -> float:
+    def mean_rating(self) -> float | None:
         if not self.valid_ratings:
-            return 0.0
+            return None
         return np.mean(self.valid_ratings)
 
     @computed_field
     @property
-    def std_dev(self) -> float:
+    def std_dev(self) -> float | None:
         if not self.valid_ratings:
-            return 0.0
+            return None
         return np.std(self.valid_ratings)

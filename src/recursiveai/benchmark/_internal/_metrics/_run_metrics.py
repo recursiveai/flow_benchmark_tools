@@ -16,8 +16,18 @@ class RunMetrics(BaseModel):
 
     @computed_field
     @cached_property
-    def ratings(self) -> list[float]:
+    def ratings(self) -> list[float | None]:
         return [bm_m.mean_rating for bm_m in self.benchmark_metrics]
+
+    @computed_field
+    @property
+    def num_valid_ratings(self) -> int:
+        return len(self.valid_ratings)
+
+    @computed_field
+    @cached_property
+    def valid_ratings(self) -> list[float]:
+        return list(filter(None, self.ratings))
 
     @computed_field
     @property
@@ -27,32 +37,32 @@ class RunMetrics(BaseModel):
     @computed_field
     @cached_property
     def sorted_enumerated_ratings(self) -> list[tuple[int, float]]:
-        return sorted(enumerate(self.ratings), key=lambda x: x[1])
+        return sorted(enumerate(self.ratings), key=lambda x: (x[1] is not None, x[1]))
 
     @computed_field
     @property
     def histogram(self) -> dict[str, int]:
-        bins = [-0.5, 0.5, 4.5, 7.5, 10.5]
-        counts, _ = np.histogram(self.ratings, bins=bins)
-        if len(counts) == 4:
+        bins = [-0.5, 4.5, 7.5, 10.5]
+        counts, _ = np.histogram(self.valid_ratings, bins=bins)
+        if len(counts) == 3:
             return {
-                "invalid": int(counts[0]),
-                "poor": int(counts[1]),
-                "fair": int(counts[2]),
-                "good": int(counts[3]),
+                "invalid": len(self.ratings) - len(self.valid_ratings),
+                "poor": int(counts[0]),
+                "fair": int(counts[1]),
+                "good": int(counts[2]),
             }
         return {}
 
     @computed_field
     @property
-    def mean_rating(self) -> float:
-        if not self.ratings:
-            return 0.0
-        return np.mean(self.ratings)
+    def mean_rating(self) -> float | None:
+        if not self.valid_ratings:
+            return None
+        return np.mean(self.valid_ratings)
 
     @computed_field
     @property
-    def std_dev(self) -> float:
-        if not self.ratings:
-            return 0.0
-        return np.std(self.ratings)
+    def std_dev(self) -> float | None:
+        if not self.valid_ratings:
+            return None
+        return np.std(self.valid_ratings)
