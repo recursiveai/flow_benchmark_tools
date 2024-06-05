@@ -30,6 +30,7 @@ def benchmark_outputs(benchmark_list, sample_evaluation):
                 sample_evaluation,
                 None,
             ],
+            runtime=1.0,
         )
         benchmark_outputs.append(output)
     return benchmark_outputs
@@ -57,7 +58,7 @@ def test_save_runs_to_json(run_outputs):
         runs=[], results_folder="benchmark_temp", results_file="results.json"
     )
     try:
-        runner._save_run_results_to_json(results=run_outputs)
+        runner._save_run_results_to_json(results=run_outputs, runtime=3.5)
 
         # If the output is not a valid JSON, this will raise an exception and the test will fail
         with open("benchmark_temp/results.json", "r") as f:
@@ -87,6 +88,7 @@ async def test_execute_run_success(benchmark_list):
         assert out.info == benchmark_list[idx]
         assert len(out.evaluations) == out.repeats
         assert all([evl.test_answer == "success" for evl in out.evaluations])
+        assert out.runtime is not None
 
 
 @pytest.mark.asyncio
@@ -106,6 +108,7 @@ async def test_execute_run_failure_exit_code(benchmark_list):
         assert out.info == benchmark_list[idx]
         assert len(out.evaluations) == out.repeats
         assert all([evl is None for evl in out.evaluations])
+        assert out.runtime is not None
 
 
 @pytest.mark.asyncio
@@ -123,6 +126,7 @@ async def test_execute_run_failure_exception(benchmark_list):
         assert out.info == benchmark_list[idx]
         assert len(out.evaluations) == out.repeats
         assert all([evl is None for evl in out.evaluations])
+        assert out.runtime is not None
 
 
 def test_negative_repeats():

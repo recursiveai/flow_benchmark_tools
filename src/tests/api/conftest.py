@@ -1,7 +1,6 @@
 import pytest
 
-from recursiveai.benchmark.api import Benchmark, BenchmarkRun
-from recursiveai.benchmark.api.agents import CallbackAgent
+from recursiveai.benchmark.api import Benchmark
 
 
 @pytest.fixture

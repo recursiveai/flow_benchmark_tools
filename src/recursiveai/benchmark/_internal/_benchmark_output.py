@@ -10,6 +10,7 @@ class BenchmarkOutput(BaseModel):
     info: Benchmark
     repeats: int = 1
     evaluations: list[Evaluation | None]
+    runtime: float | None = None
 
     @computed_field
     @property

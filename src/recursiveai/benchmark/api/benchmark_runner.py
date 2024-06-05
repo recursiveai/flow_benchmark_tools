@@ -3,6 +3,7 @@ import datetime
 import json
 import logging
 import os
+import time
 
 from .._internal._benchmark_output import BenchmarkOutput
 from .._internal._evaluators import get_evaluator
@@ -47,8 +48,10 @@ class BenchmarkRunner:
             self._repeats = repeats
 
     async def run(self) -> None:
+        start_time = time.time()
         results = await asyncio.gather(*[self._execute_run(run) for run in self._runs])
-        self._save_run_results_to_json(results=results)
+        runtime = time.time() - start_time
+        self._save_run_results_to_json(results=results, runtime=runtime)
 
     async def _execute_run(self, run: BenchmarkRun) -> RunOutput:
         date = datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
@@ -62,6 +65,7 @@ class BenchmarkRunner:
                 benchmark,
             )
             evaluations = []
+            start_time = time.time()
             for repeat in range(self._repeats):
                 _logger.info("Repeat %s of %s", repeat + 1, self._repeats)
                 evaluation = None
@@ -82,12 +86,14 @@ class BenchmarkRunner:
                     _logger.exception("Caught exception while running benchmark")
 
                 evaluations.append(evaluation)
+            runtime = time.time() - start_time
             outputs.append(
                 BenchmarkOutput(
                     id=idx,
                     info=benchmark,
                     repeats=self._repeats,
                     evaluations=evaluations,
+                    runtime=runtime,
                 )
             )
         return RunOutput(
@@ -95,8 +101,7 @@ class BenchmarkRunner:
         )
 
     def _save_run_results_to_json(
-        self,
-        results: list[RunOutput],
+        self, results: list[RunOutput], runtime: float | None = None
     ) -> None:
         filename = self._results_file
         if not self._results_file:
@@ -108,6 +113,8 @@ class BenchmarkRunner:
 
         full_path = os.path.join(folder, filename)
         _logger.info("Saving results to %s", full_path)
+        output = {}
         with open(full_path, "w") as f:
-            dumps = {"runs": [result.model_dump() for result in results]}
-            json.dump(dumps, f, ensure_ascii=False, indent=4)
+            output["total_runtime"] = runtime
+            output["runs"] = [result.model_dump() for result in results]
+            json.dump(output, f, ensure_ascii=False, indent=4)
