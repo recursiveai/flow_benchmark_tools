@@ -23,7 +23,7 @@ class BenchmarkRunner:
     def __init__(
         self,
         runs: list[BenchmarkRun] | BenchmarkRun,
-        evaluator: Evaluator = Evaluator.LLM_JUDGE_GPT_4_TURBO_PREVIEW,
+        evaluator: Evaluator = Evaluator.LLM_JUDGE_GPT_4_0,
         results_folder=_DEFAULT_RESULTS_FOLDER,
         results_file="",
         repeats: int = 1,

@@ -1,22 +1,25 @@
 # Copyright 2024 Recursive AI
 
-from recursiveai.benchmark.api.benchmark_evaluator import Evaluator
-
 from .._benchmark_evaluator import BenchmarkEvaluator
+from .._llm._anthropic_claude_model import CLAUDE_3_HAIKU, CLAUDE_3_OPUS
 from .._llm._openai_gpt_model import GPT_3_5_TURBO, GPT_4_O, GPT_4_TURBO_PREVIEW
 from ._happy import HappyEvaluator
 from ._llm_judge import LLMJudgeEvaluator
 
 
-def get_evaluator(evaluator: Evaluator) -> BenchmarkEvaluator:
+def get_evaluator(evaluator: str) -> BenchmarkEvaluator:
     match (evaluator):
-        case Evaluator.HAPPY:
+        case "happy":
             return HappyEvaluator()
-        case Evaluator.LLM_JUDGE_GPT_3_5_TURBO:
+        case "llm_judge_gpt-3.5-turbo":
             return LLMJudgeEvaluator(model=GPT_3_5_TURBO)
-        case Evaluator.LLM_JUDGE_GPT_4_TURBO_PREVIEW:
+        case "llm_judge_gpt-4-turbo-preview":
             return LLMJudgeEvaluator(model=GPT_4_TURBO_PREVIEW)
-        case Evaluator.LLM_JUDGE_GPT_4_0:
+        case "llm_judge_gpt-4o":
             return LLMJudgeEvaluator(model=GPT_4_O)
+        case "llm_judge_claude-3-opus":
+            return LLMJudgeEvaluator(model=CLAUDE_3_OPUS)
+        case "llm_judge_claude-3-haiku":
+            return LLMJudgeEvaluator(model=CLAUDE_3_HAIKU)
         case _:
             return LLMJudgeEvaluator(model=GPT_4_O)

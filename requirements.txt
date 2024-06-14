@@ -2,3 +2,4 @@ pydantic[email]==2.7.1
 openai==1.33.0
 tiktoken==0.7.0
 numpy==1.26.4
+anthropic==0.28.0

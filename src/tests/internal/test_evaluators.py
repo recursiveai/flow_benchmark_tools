@@ -81,6 +81,23 @@ def test_get_gpt_4_o_evaluator():
     assert evaluator._model.name == "gpt-4o"
 
 
+def test_get_claude_3_opus_evaluator():
+    evaluator = get_evaluator(Evaluator.LLM_JUDGE_CLAUDE_3_OPUS)
+    assert isinstance(evaluator, LLMJudgeEvaluator)
+    assert evaluator._model.name == "claude-3-opus-20240229"
+
+
+def test_get_claude_3_haiku_evaluator():
+    evaluator = get_evaluator(Evaluator.LLM_JUDGE_CLAUDE_3_HAIKU)
+    assert isinstance(evaluator, LLMJudgeEvaluator)
+    assert evaluator._model.name == "claude-3-haiku-20240307"
+
+
+def test_get_default_evaluator():
+    evaluator = get_evaluator("test")
+    assert isinstance(evaluator, LLMJudgeEvaluator)
+
+
 @pytest.mark.asyncio
 async def test_llm_judge_evaluate_success(model_mock):
     mock_evaluation = "Rating: [[5]]"
