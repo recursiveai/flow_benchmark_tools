@@ -3,7 +3,7 @@
 TARGET_REPO := https://asia-python.pkg.dev/recursive-research-core/recursive-common-pypi/
 
 install: ## Install/Upgrade all dependencies in editable mode
-	pip install --upgrade -e '.[core,dev,pub]'
+	pip install --upgrade -e '.[dev,pub]'
 
 pre-commit: ## Install pre-commit
 	pre-commit install
