@@ -11,9 +11,10 @@ _REFERENCED_JUDGE_SYSTEM_PROMPT = (
     "You will be given two answers to a user question: a reference answer and a test answer.\n"
     "Assume that the reference answer is the perfect answer to the user question.\n"
     "Please act as an impartial and objective judge and evaluate the quality of the test answer by comparing it with the reference answer.\n"
-    "Begin your evaluation by providing a short description of the similarities and dissimilarities between the two answers, including any information missing from the test answer.\n"
+    "Begin your evaluation by providing a short description of the similarities and dissimilarities between the two answers, including any information missing from the test answer. Write this description in English.\n"
     "You should compare only the information that is relevant to the user question.\n"
     "Do not allow the length or the format of the answers to influence your evaluation.\n"
+    "Language is important: the test answer should be written in the same language as the reference answer. For example, if the reference answer is written in Japanese, the test answer should also be written in Japanese.\n"
     'After providing your short description, you must rate the test answer on a scale of 1 to 10 by strictly following this format: "[[rating]]", for example: "Rating: [[5]]"\n'
 )
 
