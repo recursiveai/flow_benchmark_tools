@@ -17,18 +17,22 @@ _REFERENCED_JUDGE_SYSTEM_PROMPT = (
     "If the test answer contains additional information relevant to the user question that is not present in the reference answer, you should not penalize it for that.\n"
     "If the test answer is not written in the same language as the reference answer, you should consider this a major flaw.\n"
     'After providing your short description, you must rate the test answer on a scale of 1 to 10 by strictly following this format: "[[rating]]", for example: "Rating: [[5]]"\n'
+    "If the test answer is empty, give a rating of 1.\n"
     "Write your response in English, even if the user question and the answers are written in a different language.\n"
 )
 
 _REFERENCED_JUDGE_USER_PROMPT = (
     "[User question]\n"
     "{question}\n"
+    "[End of user question]\n"
     "\n"
     "[Reference answer]\n"
     "{reference_answer}\n"
+    "[End of reference answer]\n"
     "\n"
     "[Test answer]\n"
     "{test_answer}\n"
+    "[End of test answer]\n"
 )
 
 
