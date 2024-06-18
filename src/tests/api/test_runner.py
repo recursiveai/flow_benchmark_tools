@@ -72,7 +72,7 @@ def test_save_runs_to_json(run_outputs):
 
 
 @pytest.mark.asyncio
-async def test_execute_run_success(benchmark_list):
+async def test_execute_run_sequential_success(benchmark_list):
     agent = Mock()
     agent.name = "test_agent"
     agent.run_benchmark = AsyncMock(
@@ -80,11 +80,33 @@ async def test_execute_run_success(benchmark_list):
     )
     run = BenchmarkRun(agent=agent, benchmarks=benchmark_list)
 
-    runner = BenchmarkRunner(runs=[], evaluator=Evaluator.HAPPY)
+    runner = BenchmarkRunner(runs=[], evaluator=Evaluator.HAPPY, parallel=False)
     result = await runner._execute_run(run=run)
 
     assert len(result.benchmark_outputs) == len(benchmark_list)
     for idx, out in enumerate(result.benchmark_outputs):
+        assert out.id == idx
+        assert out.info == benchmark_list[idx]
+        assert len(out.evaluations) == out.repeats
+        assert all([evl.test_answer == "success" for evl in out.evaluations])
+        assert out.runtime is not None
+
+
+@pytest.mark.asyncio
+async def test_execute_run_parallel_success(benchmark_list):
+    agent = Mock()
+    agent.name = "test_agent"
+    agent.run_benchmark = AsyncMock(
+        return_value=BenchmarkResponse(exit_code=ExitCode.SUCCESS, response="success")
+    )
+    run = BenchmarkRun(agent=agent, benchmarks=benchmark_list)
+
+    runner = BenchmarkRunner(runs=[], evaluator=Evaluator.HAPPY, parallel=True)
+    result = await runner._execute_run(run=run)
+
+    assert len(result.benchmark_outputs) == len(benchmark_list)
+    for idx, out in enumerate(result.benchmark_outputs):
+        assert out.id == idx
         assert out.info == benchmark_list[idx]
         assert len(out.evaluations) == out.repeats
         assert all([evl.test_answer == "success" for evl in out.evaluations])
@@ -105,6 +127,7 @@ async def test_execute_run_failure_exit_code(benchmark_list):
 
     assert len(result.benchmark_outputs) == len(benchmark_list)
     for idx, out in enumerate(result.benchmark_outputs):
+        assert out.id == idx
         assert out.info == benchmark_list[idx]
         assert len(out.evaluations) == out.repeats
         assert all([evl is None for evl in out.evaluations])
@@ -123,6 +146,7 @@ async def test_execute_run_failure_exception(benchmark_list):
 
     assert len(result.benchmark_outputs) == len(benchmark_list)
     for idx, out in enumerate(result.benchmark_outputs):
+        assert out.id == idx
         assert out.info == benchmark_list[idx]
         assert len(out.evaluations) == out.repeats
         assert all([evl is None for evl in out.evaluations])

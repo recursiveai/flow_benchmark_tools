@@ -8,6 +8,8 @@ import time
 from .._internal._benchmark_output import BenchmarkOutput
 from .._internal._evaluators import get_evaluator
 from .._internal._run_output import RunOutput
+from .benchmark import Benchmark
+from .benchmark_agent import BenchmarkAgent
 from .benchmark_evaluator import Evaluator
 from .benchmark_run import BenchmarkRun
 from .exit_code import ExitCode
@@ -27,6 +29,7 @@ class BenchmarkRunner:
         results_folder=_DEFAULT_RESULTS_FOLDER,
         results_file="",
         repeats: int = 1,
+        parallel: bool = False,
     ) -> None:
         if isinstance(runs, list):
             self._runs = runs
@@ -46,6 +49,7 @@ class BenchmarkRunner:
             self._repeats = _MAX_NUM_REPEATS
         else:
             self._repeats = repeats
+        self._parallel = parallel
 
     async def run(self) -> None:
         start_time = time.time()
@@ -55,49 +59,71 @@ class BenchmarkRunner:
 
     async def _execute_run(self, run: BenchmarkRun) -> RunOutput:
         date = datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
-        outputs = []
-        for idx, benchmark in enumerate(run.benchmarks):
-            _logger.info(
-                "Benchmark %s of %s: agent=%s benchmark=%s",
-                idx + 1,
-                len(run.benchmarks),
-                run.agent.name,
-                benchmark,
+        if self._parallel:
+            outputs = await asyncio.gather(
+                *[
+                    self._execute_benchmark(
+                        agent=run.agent,
+                        benchmark=benchmark,
+                        idx=idx,
+                        total=len(run.benchmarks),
+                    )
+                    for idx, benchmark in enumerate(run.benchmarks)
+                ]
             )
-            evaluations = []
-            start_time = time.time()
-            for repeat in range(self._repeats):
-                _logger.info("Repeat %s of %s", repeat + 1, self._repeats)
-                evaluation = None
-                try:
-                    response = await run.agent.run_benchmark(benchmark)
-                    if response.exit_code == ExitCode.SUCCESS:
-                        evaluation = await self._evaluator.evaluate(
-                            query=benchmark.query,
-                            reference_answer=benchmark.reference_answer,
-                            test_answer=response.response,
-                        )
-                    else:
-                        _logger.error(
-                            "Benchmark exit_code is not SUCCESS: %s", response.exit_code
-                        )
-
-                except Exception:
-                    _logger.exception("Caught exception while running benchmark")
-
-                evaluations.append(evaluation)
-            runtime = time.time() - start_time
-            outputs.append(
-                BenchmarkOutput(
-                    id=idx,
-                    info=benchmark,
-                    repeats=self._repeats,
-                    evaluations=evaluations,
-                    runtime=runtime,
+        else:
+            outputs = []
+            for idx, benchmark in enumerate(run.benchmarks):
+                output = await self._execute_benchmark(
+                    agent=run.agent,
+                    benchmark=benchmark,
+                    idx=idx,
+                    total=len(run.benchmarks),
                 )
-            )
+                outputs.append(output)
         return RunOutput(
             date=date, agent_name=run.agent.name, benchmark_outputs=outputs
+        )
+
+    async def _execute_benchmark(
+        self, agent: BenchmarkAgent, benchmark: Benchmark, idx: int, total: int
+    ) -> BenchmarkOutput:
+        _logger.info(
+            "Benchmark %s of %s: agent=%s benchmark=%s",
+            idx + 1,
+            total,
+            agent.name,
+            benchmark,
+        )
+        evaluations = []
+        start_time = time.time()
+        for repeat in range(self._repeats):
+            _logger.info("Repeat %s of %s", repeat + 1, self._repeats)
+            evaluation = None
+            try:
+                response = await agent.run_benchmark(benchmark)
+                if response.exit_code == ExitCode.SUCCESS:
+                    evaluation = await self._evaluator.evaluate(
+                        query=benchmark.query,
+                        reference_answer=benchmark.reference_answer,
+                        test_answer=response.response,
+                    )
+                else:
+                    _logger.error(
+                        "Benchmark exit_code is not SUCCESS: %s", response.exit_code
+                    )
+
+            except Exception:
+                _logger.exception("Caught exception while running benchmark")
+
+            evaluations.append(evaluation)
+        runtime = time.time() - start_time
+        return BenchmarkOutput(
+            id=idx,
+            info=benchmark,
+            repeats=self._repeats,
+            evaluations=evaluations,
+            runtime=runtime,
         )
 
     def _save_run_results_to_json(
