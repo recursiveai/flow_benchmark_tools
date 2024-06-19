@@ -59,6 +59,7 @@ class BenchmarkRunner:
 
     async def _execute_run(self, run: BenchmarkRun) -> RunOutput:
         date = datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+        await run.agent.before_run()
         if self._parallel:
             outputs = await asyncio.gather(
                 *[
@@ -81,6 +82,7 @@ class BenchmarkRunner:
                     total=len(run.benchmarks),
                 )
                 outputs.append(output)
+        await run.agent.after_run()
         return RunOutput(
             date=date, agent_name=run.agent.name, benchmark_outputs=outputs
         )
@@ -101,6 +103,7 @@ class BenchmarkRunner:
             _logger.info("Repeat %s of %s", repeat + 1, self._repeats)
             evaluation = None
             try:
+                await agent.before_benchmark()
                 response = await agent.run_benchmark(benchmark)
                 if response.exit_code == ExitCode.SUCCESS:
                     evaluation = await self._evaluator.evaluate(
@@ -115,6 +118,12 @@ class BenchmarkRunner:
 
             except Exception:
                 _logger.exception("Caught exception while running benchmark")
+
+            finally:
+                try:
+                    await agent.after_benchmark()
+                except Exception:
+                    _logger.exception("Caught exception while running after_benchmark")
 
             evaluations.append(evaluation)
         runtime = time.time() - start_time

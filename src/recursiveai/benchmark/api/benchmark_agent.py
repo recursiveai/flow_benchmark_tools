@@ -15,6 +15,18 @@ class BenchmarkAgent(ABC):
     async def run_benchmark(self, benchmark: Benchmark) -> BenchmarkResponse:
         raise NotImplementedError()
 
+    async def before_run(self) -> None:
+        pass
+
+    async def before_benchmark(self) -> None:
+        pass
+
+    async def after_benchmark(self) -> None:
+        pass
+
+    async def after_run(self) -> None:
+        pass
+
     @property
     def name(self) -> str:
         return self.__class__.__name__

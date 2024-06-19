@@ -73,7 +73,7 @@ def test_save_runs_to_json(run_outputs):
 
 @pytest.mark.asyncio
 async def test_execute_run_sequential_success(benchmark_list):
-    agent = Mock()
+    agent = AsyncMock()
     agent.name = "test_agent"
     agent.run_benchmark = AsyncMock(
         return_value=BenchmarkResponse(exit_code=ExitCode.SUCCESS, response="success")
@@ -84,6 +84,10 @@ async def test_execute_run_sequential_success(benchmark_list):
     result = await runner._execute_run(run=run)
 
     assert len(result.benchmark_outputs) == len(benchmark_list)
+    agent.before_run.assert_awaited_once()
+    agent.after_run.assert_awaited_once()
+    assert agent.before_benchmark.await_count == len(benchmark_list)
+    assert agent.after_benchmark.await_count == len(benchmark_list)
     for idx, out in enumerate(result.benchmark_outputs):
         assert out.id == idx
         assert out.info == benchmark_list[idx]
@@ -94,7 +98,7 @@ async def test_execute_run_sequential_success(benchmark_list):
 
 @pytest.mark.asyncio
 async def test_execute_run_parallel_success(benchmark_list):
-    agent = Mock()
+    agent = AsyncMock()
     agent.name = "test_agent"
     agent.run_benchmark = AsyncMock(
         return_value=BenchmarkResponse(exit_code=ExitCode.SUCCESS, response="success")
@@ -105,6 +109,10 @@ async def test_execute_run_parallel_success(benchmark_list):
     result = await runner._execute_run(run=run)
 
     assert len(result.benchmark_outputs) == len(benchmark_list)
+    agent.before_run.assert_awaited_once()
+    agent.after_run.assert_awaited_once()
+    assert agent.before_benchmark.await_count == len(benchmark_list)
+    assert agent.after_benchmark.await_count == len(benchmark_list)
     for idx, out in enumerate(result.benchmark_outputs):
         assert out.id == idx
         assert out.info == benchmark_list[idx]
@@ -115,7 +123,7 @@ async def test_execute_run_parallel_success(benchmark_list):
 
 @pytest.mark.asyncio
 async def test_execute_run_failure_exit_code(benchmark_list):
-    agent = Mock()
+    agent = AsyncMock()
     agent.name = "test_agent"
     agent.run_benchmark = AsyncMock(
         return_value=BenchmarkResponse(exit_code=ExitCode.FAILED)
@@ -126,6 +134,10 @@ async def test_execute_run_failure_exit_code(benchmark_list):
     result = await runner._execute_run(run=run)
 
     assert len(result.benchmark_outputs) == len(benchmark_list)
+    agent.before_run.assert_awaited_once()
+    agent.after_run.assert_awaited_once()
+    assert agent.before_benchmark.await_count == len(benchmark_list)
+    assert agent.after_benchmark.await_count == len(benchmark_list)
     for idx, out in enumerate(result.benchmark_outputs):
         assert out.id == idx
         assert out.info == benchmark_list[idx]
@@ -136,7 +148,7 @@ async def test_execute_run_failure_exit_code(benchmark_list):
 
 @pytest.mark.asyncio
 async def test_execute_run_failure_exception(benchmark_list):
-    agent = Mock()
+    agent = AsyncMock()
     agent.name = "test_agent"
     agent.run_benchmark = AsyncMock(side_effect=Exception())
     run = BenchmarkRun(agent=agent, benchmarks=benchmark_list)
@@ -145,6 +157,10 @@ async def test_execute_run_failure_exception(benchmark_list):
     result = await runner._execute_run(run=run)
 
     assert len(result.benchmark_outputs) == len(benchmark_list)
+    agent.before_run.assert_awaited_once()
+    agent.after_run.assert_awaited_once()
+    assert agent.before_benchmark.await_count == len(benchmark_list)
+    assert agent.after_benchmark.await_count == len(benchmark_list)
     for idx, out in enumerate(result.benchmark_outputs):
         assert out.id == idx
         assert out.info == benchmark_list[idx]
