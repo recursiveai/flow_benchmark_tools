@@ -93,6 +93,18 @@ def test_get_claude_3_haiku_evaluator():
     assert evaluator._model.name == "claude-3-haiku-20240307"
 
 
+def test_get_gemini_1_5_flash_evaluator():
+    evaluator = get_evaluator(Evaluator.LLM_JUDGE_GEMINI_1_5_FLASH)
+    assert isinstance(evaluator, LLMJudgeEvaluator)
+    assert evaluator._model.name == "gemini-1.5-flash"
+
+
+def test_get_gemini_1_5_pro_evaluator():
+    evaluator = get_evaluator(Evaluator.LLM_JUDGE_GEMINI_1_5_PRO)
+    assert isinstance(evaluator, LLMJudgeEvaluator)
+    assert evaluator._model.name == "gemini-1.5-pro"
+
+
 def test_get_default_evaluator():
     evaluator = get_evaluator("test")
     assert isinstance(evaluator, LLMJudgeEvaluator)

@@ -3,3 +3,4 @@ openai~=1.29
 tiktoken~=0.7.0
 numpy~=1.26
 anthropic~=0.28
+google-generativeai~=0.7

@@ -52,9 +52,9 @@ class GPTX(LLMModel):
         chat: list[ChatMessage],
         **kwargs,
     ) -> str | None:
-        temperature = kwargs.get("temperature", 0.3)
-        max_tokens = kwargs.get("max_tokens", 256)
-        timeout = kwargs.get("timeout", 30)
+        temperature = kwargs.get("temperature", 0.0)
+        max_tokens = kwargs.get("max_tokens", 1024)
+        timeout = kwargs.get("timeout", 60)
 
         messages = [
             {
@@ -85,9 +85,9 @@ class GPTX(LLMModel):
         chat: list[ChatMessage],
         **kwargs,
     ) -> AsyncIterable[ChatResponseChunk] | None:
-        temperature = kwargs.get("temperature", 0.3)
+        temperature = kwargs.get("temperature", 0.0)
         max_tokens = kwargs.get("max_tokens", 1024)
-        timeout = kwargs.get("timeout", 30)
+        timeout = kwargs.get("timeout", 60)
 
         messages = [
             {

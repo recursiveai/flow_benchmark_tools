@@ -8,3 +8,5 @@ class Evaluator(str, Enum):
     LLM_JUDGE_GPT_4_0 = "llm_judge_gpt-4o"
     LLM_JUDGE_CLAUDE_3_OPUS = "llm_judge_claude-3-opus"
     LLM_JUDGE_CLAUDE_3_HAIKU = "llm_judge_claude-3-haiku"
+    LLM_JUDGE_GEMINI_1_5_FLASH = "llm_judge_gemini-1.5-flash"
+    LLM_JUDGE_GEMINI_1_5_PRO = "llm_judge_gemini-1.5-pro"
