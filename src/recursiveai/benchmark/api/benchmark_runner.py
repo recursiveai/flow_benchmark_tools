@@ -103,7 +103,7 @@ class BenchmarkRunner:
             _logger.info("Repeat %s of %s", repeat + 1, self._repeats)
             evaluation = None
             try:
-                await agent.before_benchmark()
+                await agent.before_benchmark(benchmark)
                 response = await agent.run_benchmark(benchmark)
                 if response.exit_code == ExitCode.SUCCESS:
                     evaluation = await self._evaluator.evaluate(
@@ -121,7 +121,7 @@ class BenchmarkRunner:
 
             finally:
                 try:
-                    await agent.after_benchmark()
+                    await agent.after_benchmark(benchmark)
                 except Exception:
                     _logger.exception("Caught exception while running after_benchmark")
 

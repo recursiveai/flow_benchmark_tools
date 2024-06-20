@@ -18,10 +18,10 @@ class BenchmarkAgent(ABC):
     async def before_run(self) -> None:
         pass
 
-    async def before_benchmark(self) -> None:
+    async def before_benchmark(self, benchmark: Benchmark) -> None:
         pass
 
-    async def after_benchmark(self) -> None:
+    async def after_benchmark(self, benchmark: Benchmark) -> None:
         pass
 
     async def after_run(self) -> None:

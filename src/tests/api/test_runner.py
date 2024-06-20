@@ -86,14 +86,14 @@ async def test_execute_run_sequential_success(benchmark_list):
     assert len(result.benchmark_outputs) == len(benchmark_list)
     agent.before_run.assert_awaited_once()
     agent.after_run.assert_awaited_once()
-    assert agent.before_benchmark.await_count == len(benchmark_list)
-    assert agent.after_benchmark.await_count == len(benchmark_list)
     for idx, out in enumerate(result.benchmark_outputs):
         assert out.id == idx
         assert out.info == benchmark_list[idx]
         assert len(out.evaluations) == out.repeats
         assert all([evl.test_answer == "success" for evl in out.evaluations])
         assert out.runtime is not None
+        agent.before_benchmark.assert_any_await(benchmark_list[idx])
+        agent.after_benchmark.assert_any_await(benchmark_list[idx])
 
 
 @pytest.mark.asyncio
@@ -111,14 +111,14 @@ async def test_execute_run_parallel_success(benchmark_list):
     assert len(result.benchmark_outputs) == len(benchmark_list)
     agent.before_run.assert_awaited_once()
     agent.after_run.assert_awaited_once()
-    assert agent.before_benchmark.await_count == len(benchmark_list)
-    assert agent.after_benchmark.await_count == len(benchmark_list)
     for idx, out in enumerate(result.benchmark_outputs):
         assert out.id == idx
         assert out.info == benchmark_list[idx]
         assert len(out.evaluations) == out.repeats
         assert all([evl.test_answer == "success" for evl in out.evaluations])
         assert out.runtime is not None
+        agent.before_benchmark.assert_any_await(benchmark_list[idx])
+        agent.after_benchmark.assert_any_await(benchmark_list[idx])
 
 
 @pytest.mark.asyncio
@@ -136,14 +136,14 @@ async def test_execute_run_failure_exit_code(benchmark_list):
     assert len(result.benchmark_outputs) == len(benchmark_list)
     agent.before_run.assert_awaited_once()
     agent.after_run.assert_awaited_once()
-    assert agent.before_benchmark.await_count == len(benchmark_list)
-    assert agent.after_benchmark.await_count == len(benchmark_list)
     for idx, out in enumerate(result.benchmark_outputs):
         assert out.id == idx
         assert out.info == benchmark_list[idx]
         assert len(out.evaluations) == out.repeats
         assert all([evl is None for evl in out.evaluations])
         assert out.runtime is not None
+        agent.before_benchmark.assert_any_await(benchmark_list[idx])
+        agent.after_benchmark.assert_any_await(benchmark_list[idx])
 
 
 @pytest.mark.asyncio
@@ -159,14 +159,14 @@ async def test_execute_run_failure_exception(benchmark_list):
     assert len(result.benchmark_outputs) == len(benchmark_list)
     agent.before_run.assert_awaited_once()
     agent.after_run.assert_awaited_once()
-    assert agent.before_benchmark.await_count == len(benchmark_list)
-    assert agent.after_benchmark.await_count == len(benchmark_list)
     for idx, out in enumerate(result.benchmark_outputs):
         assert out.id == idx
         assert out.info == benchmark_list[idx]
         assert len(out.evaluations) == out.repeats
         assert all([evl is None for evl in out.evaluations])
         assert out.runtime is not None
+        agent.before_benchmark.assert_any_await(benchmark_list[idx])
+        agent.after_benchmark.assert_any_await(benchmark_list[idx])
 
 
 def test_negative_repeats():
