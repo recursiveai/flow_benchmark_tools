@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "recursiveai-benchmark-lab"
-version = "0.1.12"
+version = "0.1.13"
 description = "A library containing LLM benchmarking tools"
 readme = "README.md"
 requires-python=">=3.8,<3.12"
