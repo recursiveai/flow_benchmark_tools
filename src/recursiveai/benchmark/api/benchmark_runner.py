@@ -8,8 +8,8 @@ import time
 from .._internal._benchmark_output import BenchmarkOutput
 from .._internal._evaluators import get_evaluator
 from .._internal._run_output import RunOutput
-from .benchmark import Benchmark
 from .benchmark_agent import BenchmarkAgent
+from .benchmark_case import BenchmarkCase
 from .benchmark_evaluator import Evaluator
 from .benchmark_run import BenchmarkRun
 from .exit_code import ExitCode
@@ -59,7 +59,8 @@ class BenchmarkRunner:
 
     async def _execute_run(self, run: BenchmarkRun) -> RunOutput:
         date = datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
-        await run.agent.before_run()
+        await run.agent.before_run(run.benchmark)
+        cases = run.benchmark.cases
         if self._parallel:
             outputs = await asyncio.gather(
                 *[
@@ -67,28 +68,28 @@ class BenchmarkRunner:
                         agent=run.agent,
                         benchmark=benchmark,
                         idx=idx,
-                        total=len(run.benchmarks),
+                        total=len(cases),
                     )
-                    for idx, benchmark in enumerate(run.benchmarks)
+                    for idx, benchmark in enumerate(cases)
                 ]
             )
         else:
             outputs = []
-            for idx, benchmark in enumerate(run.benchmarks):
+            for idx, benchmark in enumerate(cases):
                 output = await self._execute_benchmark(
                     agent=run.agent,
                     benchmark=benchmark,
                     idx=idx,
-                    total=len(run.benchmarks),
+                    total=len(cases),
                 )
                 outputs.append(output)
-        await run.agent.after_run()
+        await run.agent.after_run(run.benchmark)
         return RunOutput(
             date=date, agent_name=run.agent.name, benchmark_outputs=outputs
         )
 
     async def _execute_benchmark(
-        self, agent: BenchmarkAgent, benchmark: Benchmark, idx: int, total: int
+        self, agent: BenchmarkAgent, benchmark: BenchmarkCase, idx: int, total: int
     ) -> BenchmarkOutput:
         _logger.info(
             "Benchmark %s of %s: agent=%s benchmark=%s",
@@ -103,8 +104,8 @@ class BenchmarkRunner:
             _logger.info("Repeat %s of %s", repeat + 1, self._repeats)
             evaluation = None
             try:
-                await agent.before_benchmark(benchmark)
-                response = await agent.run_benchmark(benchmark)
+                await agent.before_case(benchmark)
+                response = await agent.run_benchmark_case(benchmark)
                 if response.exit_code == ExitCode.SUCCESS:
                     evaluation = await self._evaluator.evaluate(
                         query=benchmark.query,
@@ -121,7 +122,7 @@ class BenchmarkRunner:
 
             finally:
                 try:
-                    await agent.after_benchmark(benchmark)
+                    await agent.after_case(benchmark)
                 except Exception:
                     _logger.exception("Caught exception while running after_benchmark")
 

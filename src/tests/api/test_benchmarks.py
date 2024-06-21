@@ -5,10 +5,10 @@ from unittest.mock import Mock
 
 import pytest
 
-from recursiveai.benchmark.api import Benchmark, BenchmarkRun
+from recursiveai.benchmark.api import BenchmarkCase, BenchmarkRun
 from recursiveai.benchmark.api.util import (
-    create_run_from_benchmark_jsonl,
-    read_benchmarks_from_jsonl,
+    create_run_from_jsonl,
+    read_benchmark_from_jsonl,
 )
 
 _TEST_REFERENCE_ANSWER_FILE = "test_reference_answer.txt"
@@ -69,22 +69,22 @@ def benchmark_jsonl(benchmark_jsons):
 
 def test_error_on_no_reference_answer():
     with pytest.raises(ValueError):
-        Benchmark(query="This is a test query")
+        BenchmarkCase(query="This is a test query")
 
 
 def test_reference_answer_from_file(reference_answer_file):
-    benchmark = Benchmark(
+    benchmark = BenchmarkCase(
         query="This is a test query", reference_answer_file=_TEST_REFERENCE_ANSWER_FILE
     )
     assert benchmark.reference_answer == _TEST_REFERENCE_ANSWER
 
 
 def test_read_jsonl_from_file(benchmark_jsons, benchmark_jsonl):
-    benchmarks = read_benchmarks_from_jsonl(_TEST_BENCHMARK_JSONL_FILE)
+    benchmark = read_benchmark_from_jsonl(_TEST_BENCHMARK_JSONL_FILE)
 
-    assert len(benchmarks) == len(benchmark_jsons)
+    assert len(benchmark.cases) == len(benchmark_jsons)
 
-    for idx, benchmark in enumerate(benchmarks):
+    for idx, benchmark in enumerate(benchmark.cases):
         assert (
             benchmark.model_dump(exclude_none=True, exclude_unset=True)
             == benchmark_jsons[idx]
@@ -92,13 +92,11 @@ def test_read_jsonl_from_file(benchmark_jsons, benchmark_jsonl):
 
 
 def test_create_run_from_benchmark_jsonl(benchmark_jsons, benchmark_jsonl):
-    run = create_run_from_benchmark_jsonl(
-        agent=Mock(), jsonl_file=_TEST_BENCHMARK_JSONL_FILE
-    )
+    run = create_run_from_jsonl(agent=Mock(), jsonl_file=_TEST_BENCHMARK_JSONL_FILE)
 
     assert isinstance(run, BenchmarkRun)
-    assert len(run.benchmarks) == len(benchmark_jsons)
-    for idx, benchmark in enumerate(run.benchmarks):
+    assert len(run.benchmark.cases) == len(benchmark_jsons)
+    for idx, benchmark in enumerate(run.benchmark.cases):
         assert (
             benchmark.model_dump(exclude_none=True, exclude_unset=True)
             == benchmark_jsons[idx]

@@ -1,6 +1,7 @@
 .DEFAULT_GOAL := help
 .PHONY: install pre-commit pytest check pylint pyright bandit style black isort build publish help
-TARGET_REPO := https://asia-python.pkg.dev/recursive-research-core/recursive-common-pypi/
+
+# Set environment variable TARGET_REPO for publishing purposes
 
 install: ## Install/Upgrade all dependencies in editable mode
 	pip install --upgrade -e '.[dev,pub]'

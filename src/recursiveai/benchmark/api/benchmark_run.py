@@ -7,4 +7,4 @@ from .benchmark_agent import BenchmarkAgent
 @dataclass
 class BenchmarkRun:
     agent: BenchmarkAgent
-    benchmarks: list[Benchmark]
+    benchmark: Benchmark

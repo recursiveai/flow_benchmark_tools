@@ -9,7 +9,8 @@ from recursiveai.benchmark._internal._benchmark_evaluator import BenchmarkEvalua
 from recursiveai.benchmark._internal._benchmark_output import BenchmarkOutput
 from recursiveai.benchmark._internal._run_output import RunOutput
 from recursiveai.benchmark.api import (
-    BenchmarkResponse,
+    Benchmark,
+    BenchmarkCaseResponse,
     BenchmarkRun,
     BenchmarkRunner,
     ExitCode,
@@ -19,9 +20,9 @@ from recursiveai.benchmark.api.benchmark_runner import _MAX_NUM_REPEATS
 
 
 @pytest.fixture
-def benchmark_outputs(benchmark_list, sample_evaluation):
+def benchmark_outputs(benchmark_case_list, sample_evaluation):
     benchmark_outputs = []
-    for idx, bm in enumerate(benchmark_list):
+    for idx, bm in enumerate(benchmark_case_list):
         output = BenchmarkOutput(
             id=idx,
             info=bm,
@@ -72,101 +73,105 @@ def test_save_runs_to_json(run_outputs):
 
 
 @pytest.mark.asyncio
-async def test_execute_run_sequential_success(benchmark_list):
+async def test_execute_run_sequential_success(benchmark_case_list):
     agent = AsyncMock()
     agent.name = "test_agent"
-    agent.run_benchmark = AsyncMock(
-        return_value=BenchmarkResponse(exit_code=ExitCode.SUCCESS, response="success")
+    agent.run_benchmark_case = AsyncMock(
+        return_value=BenchmarkCaseResponse(
+            exit_code=ExitCode.SUCCESS, response="success"
+        )
     )
-    run = BenchmarkRun(agent=agent, benchmarks=benchmark_list)
+    run = BenchmarkRun(agent=agent, benchmark=Benchmark(cases=benchmark_case_list))
 
     runner = BenchmarkRunner(runs=[], evaluator=Evaluator.HAPPY, parallel=False)
     result = await runner._execute_run(run=run)
 
-    assert len(result.benchmark_outputs) == len(benchmark_list)
+    assert len(result.benchmark_outputs) == len(benchmark_case_list)
     agent.before_run.assert_awaited_once()
     agent.after_run.assert_awaited_once()
     for idx, out in enumerate(result.benchmark_outputs):
         assert out.id == idx
-        assert out.info == benchmark_list[idx]
+        assert out.info == benchmark_case_list[idx]
         assert len(out.evaluations) == out.repeats
         assert all([evl.test_answer == "success" for evl in out.evaluations])
         assert out.runtime is not None
-        agent.before_benchmark.assert_any_await(benchmark_list[idx])
-        agent.after_benchmark.assert_any_await(benchmark_list[idx])
+        agent.before_case.assert_any_await(benchmark_case_list[idx])
+        agent.after_case.assert_any_await(benchmark_case_list[idx])
 
 
 @pytest.mark.asyncio
-async def test_execute_run_parallel_success(benchmark_list):
+async def test_execute_run_parallel_success(benchmark_case_list):
     agent = AsyncMock()
     agent.name = "test_agent"
-    agent.run_benchmark = AsyncMock(
-        return_value=BenchmarkResponse(exit_code=ExitCode.SUCCESS, response="success")
+    agent.run_benchmark_case = AsyncMock(
+        return_value=BenchmarkCaseResponse(
+            exit_code=ExitCode.SUCCESS, response="success"
+        )
     )
-    run = BenchmarkRun(agent=agent, benchmarks=benchmark_list)
+    run = BenchmarkRun(agent=agent, benchmark=Benchmark(cases=benchmark_case_list))
 
     runner = BenchmarkRunner(runs=[], evaluator=Evaluator.HAPPY, parallel=True)
     result = await runner._execute_run(run=run)
 
-    assert len(result.benchmark_outputs) == len(benchmark_list)
+    assert len(result.benchmark_outputs) == len(benchmark_case_list)
     agent.before_run.assert_awaited_once()
     agent.after_run.assert_awaited_once()
     for idx, out in enumerate(result.benchmark_outputs):
         assert out.id == idx
-        assert out.info == benchmark_list[idx]
+        assert out.info == benchmark_case_list[idx]
         assert len(out.evaluations) == out.repeats
         assert all([evl.test_answer == "success" for evl in out.evaluations])
         assert out.runtime is not None
-        agent.before_benchmark.assert_any_await(benchmark_list[idx])
-        agent.after_benchmark.assert_any_await(benchmark_list[idx])
+        agent.before_case.assert_any_await(benchmark_case_list[idx])
+        agent.after_case.assert_any_await(benchmark_case_list[idx])
 
 
 @pytest.mark.asyncio
-async def test_execute_run_failure_exit_code(benchmark_list):
+async def test_execute_run_failure_exit_code(benchmark_case_list):
     agent = AsyncMock()
     agent.name = "test_agent"
-    agent.run_benchmark = AsyncMock(
-        return_value=BenchmarkResponse(exit_code=ExitCode.FAILED)
+    agent.run_benchmark_case = AsyncMock(
+        return_value=BenchmarkCaseResponse(exit_code=ExitCode.FAILED)
     )
-    run = BenchmarkRun(agent=agent, benchmarks=benchmark_list)
+    run = BenchmarkRun(agent=agent, benchmark=Benchmark(cases=benchmark_case_list))
 
     runner = BenchmarkRunner(runs=[], evaluator=Evaluator.HAPPY)
     result = await runner._execute_run(run=run)
 
-    assert len(result.benchmark_outputs) == len(benchmark_list)
+    assert len(result.benchmark_outputs) == len(benchmark_case_list)
     agent.before_run.assert_awaited_once()
     agent.after_run.assert_awaited_once()
     for idx, out in enumerate(result.benchmark_outputs):
         assert out.id == idx
-        assert out.info == benchmark_list[idx]
+        assert out.info == benchmark_case_list[idx]
         assert len(out.evaluations) == out.repeats
         assert all([evl is None for evl in out.evaluations])
         assert out.runtime is not None
-        agent.before_benchmark.assert_any_await(benchmark_list[idx])
-        agent.after_benchmark.assert_any_await(benchmark_list[idx])
+        agent.before_case.assert_any_await(benchmark_case_list[idx])
+        agent.after_case.assert_any_await(benchmark_case_list[idx])
 
 
 @pytest.mark.asyncio
-async def test_execute_run_failure_exception(benchmark_list):
+async def test_execute_run_failure_exception(benchmark_case_list):
     agent = AsyncMock()
     agent.name = "test_agent"
-    agent.run_benchmark = AsyncMock(side_effect=Exception())
-    run = BenchmarkRun(agent=agent, benchmarks=benchmark_list)
+    agent.run_benchmark_case = AsyncMock(side_effect=Exception())
+    run = BenchmarkRun(agent=agent, benchmark=Benchmark(cases=benchmark_case_list))
 
     runner = BenchmarkRunner(runs=[], evaluator=Evaluator.HAPPY)
     result = await runner._execute_run(run=run)
 
-    assert len(result.benchmark_outputs) == len(benchmark_list)
+    assert len(result.benchmark_outputs) == len(benchmark_case_list)
     agent.before_run.assert_awaited_once()
     agent.after_run.assert_awaited_once()
     for idx, out in enumerate(result.benchmark_outputs):
         assert out.id == idx
-        assert out.info == benchmark_list[idx]
+        assert out.info == benchmark_case_list[idx]
         assert len(out.evaluations) == out.repeats
         assert all([evl is None for evl in out.evaluations])
         assert out.runtime is not None
-        agent.before_benchmark.assert_any_await(benchmark_list[idx])
-        agent.after_benchmark.assert_any_await(benchmark_list[idx])
+        agent.before_case.assert_any_await(benchmark_case_list[idx])
+        agent.after_case.assert_any_await(benchmark_case_list[idx])
 
 
 def test_negative_repeats():
