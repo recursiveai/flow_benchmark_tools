@@ -1,6 +1,7 @@
 from abc import ABC, abstractmethod
 
-from .benchmark import Benchmark, BenchmarkResponse
+from .benchmark import Benchmark
+from .benchmark_case import BenchmarkCase, BenchmarkCaseResponse
 
 
 class BenchmarkAgent(ABC):
@@ -12,19 +13,19 @@ class BenchmarkAgent(ABC):
     """
 
     @abstractmethod
-    async def run_benchmark(self, benchmark: Benchmark) -> BenchmarkResponse:
+    async def run_benchmark_case(self, case: BenchmarkCase) -> BenchmarkCaseResponse:
         raise NotImplementedError()
 
-    async def before_run(self) -> None:
+    async def before_run(self, benchmark: Benchmark) -> None:
         pass
 
-    async def before_benchmark(self, benchmark: Benchmark) -> None:
+    async def before_case(self, case: BenchmarkCase) -> None:
         pass
 
-    async def after_benchmark(self, benchmark: Benchmark) -> None:
+    async def after_case(self, case: BenchmarkCase) -> None:
         pass
 
-    async def after_run(self) -> None:
+    async def after_run(self, benchmark: Benchmark) -> None:
         pass
 
     @property

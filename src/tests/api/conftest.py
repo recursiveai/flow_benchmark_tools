@@ -1,11 +1,11 @@
 import pytest
 
-from recursiveai.benchmark.api import Benchmark
+from recursiveai.benchmark.api import BenchmarkCase
 
 
 @pytest.fixture
-def sample_benchmark():
-    return Benchmark(
+def sample_benchmark_case():
+    return BenchmarkCase(
         query="test_query",
         reference_answer="test_reference_answer",
         labels=["testing", "mocks"],
@@ -14,11 +14,11 @@ def sample_benchmark():
 
 
 @pytest.fixture
-def benchmark_list(sample_benchmark):
+def benchmark_case_list(sample_benchmark_case):
     return [
-        sample_benchmark.model_copy(deep=True),
-        sample_benchmark.model_copy(deep=True),
-        sample_benchmark.model_copy(deep=True),
+        sample_benchmark_case.model_copy(deep=True),
+        sample_benchmark_case.model_copy(deep=True),
+        sample_benchmark_case.model_copy(deep=True),
     ]
 
 
