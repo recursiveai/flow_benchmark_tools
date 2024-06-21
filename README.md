@@ -1,3 +1,3 @@
-# Benchmark Lab
+# Flow Benchmark Tools
 
-A library for benchmarking LLM agents.
+A library for creating benchmarks for LLM agents, pipelines and more.
