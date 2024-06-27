@@ -19,6 +19,7 @@ namespaces = true
 dependencies = {file = ["requirements.txt"]}
 optional-dependencies.dev = {file = ["requirements-dev.txt"]}
 optional-dependencies.pub = {file = ["requirements-pub.txt"]}
+optional-dependencies.examples = {file = ["requirements-examples.txt"]}
 
 [tool.pytest.ini_options]
 addopts = "-ra -q -vv --cov=recursiveai"
