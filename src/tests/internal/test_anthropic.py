@@ -4,6 +4,7 @@ from unittest.mock import AsyncMock, Mock
 import pytest
 
 from recursiveai.benchmark._internal._llm._anthropic_claude_model import (
+    CLAUDE_3_5_SONNET,
     CLAUDE_3_HAIKU,
     CLAUDE_3_OPUS,
     CLAUDE_3_SONNET,
@@ -33,8 +34,13 @@ def test_no_output_window(mock_model):
 @pytest.mark.flaky(reruns=2)
 @pytest.mark.parametrize(
     argnames="model",
-    argvalues=[CLAUDE_3_HAIKU, CLAUDE_3_SONNET, CLAUDE_3_OPUS],
-    ids=[CLAUDE_3_HAIKU.name, CLAUDE_3_SONNET.name, CLAUDE_3_OPUS.name],
+    argvalues=[CLAUDE_3_HAIKU, CLAUDE_3_SONNET, CLAUDE_3_OPUS, CLAUDE_3_5_SONNET],
+    ids=[
+        CLAUDE_3_HAIKU.name,
+        CLAUDE_3_SONNET.name,
+        CLAUDE_3_OPUS.name,
+        CLAUDE_3_5_SONNET.name,
+    ],
 )
 async def test_async_chat_completion_success(model):
     chat = [
@@ -60,8 +66,13 @@ async def test_async_chat_completion_failure(mock_model):
 @pytest.mark.flaky(reruns=2)
 @pytest.mark.parametrize(
     argnames="model",
-    argvalues=[CLAUDE_3_HAIKU, CLAUDE_3_SONNET, CLAUDE_3_OPUS],
-    ids=[CLAUDE_3_HAIKU.name, CLAUDE_3_SONNET.name, CLAUDE_3_OPUS.name],
+    argvalues=[CLAUDE_3_HAIKU, CLAUDE_3_SONNET, CLAUDE_3_OPUS, CLAUDE_3_5_SONNET],
+    ids=[
+        CLAUDE_3_HAIKU.name,
+        CLAUDE_3_SONNET.name,
+        CLAUDE_3_OPUS.name,
+        CLAUDE_3_5_SONNET.name,
+    ],
 )
 async def test_async_chat_completion_stream_success(model):
     chat = [

@@ -118,6 +118,9 @@ CLAUDE_3_OPUS = AnthropicClaude(
 CLAUDE_3_SONNET = AnthropicClaude(
     name="claude-3-sonnet-20240229", context_window=200000, output_window=4096
 )
+CLAUDE_3_5_SONNET = AnthropicClaude(
+    name="claude-3-5-sonnet-20240620", context_window=200000, output_window=4096
+)
 CLAUDE_3_HAIKU = AnthropicClaude(
     name="claude-3-haiku-20240307", context_window=200000, output_window=4096
 )

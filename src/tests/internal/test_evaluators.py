@@ -87,6 +87,12 @@ def test_get_claude_3_opus_evaluator():
     assert evaluator._model.name == "claude-3-opus-20240229"
 
 
+def test_get_claude_3_5_sonnet_evaluator():
+    evaluator = get_evaluator(Evaluator.LLM_JUDGE_CLAUDE_3_5_SONNET)
+    assert isinstance(evaluator, LLMJudgeEvaluator)
+    assert evaluator._model.name == "claude-3-5-sonnet-20240620"
+
+
 def test_get_claude_3_haiku_evaluator():
     evaluator = get_evaluator(Evaluator.LLM_JUDGE_CLAUDE_3_HAIKU)
     assert isinstance(evaluator, LLMJudgeEvaluator)
