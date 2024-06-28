@@ -4,7 +4,7 @@
 # Set environment variable TARGET_REPO for publishing purposes
 
 install: ## Install/Upgrade all dependencies in editable mode
-	pip install --upgrade -e '.[dev,pub]'
+	pip install --upgrade -e '.[dev,pub,examples]'
 
 pre-commit: ## Install pre-commit
 	pre-commit install
