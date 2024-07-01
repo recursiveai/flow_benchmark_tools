@@ -15,7 +15,7 @@ def multi_evaluations():
             reference_answer="",
             test_answer="",
             evaluation="",
-            rating=5,
+            ratings=[5],
             rating_min=0,
             rating_max=10,
         ),
@@ -26,7 +26,7 @@ def multi_evaluations():
             reference_answer="",
             test_answer="",
             evaluation="",
-            rating=9,
+            ratings=[9],
             rating_min=0,
             rating_max=10,
         ),
@@ -49,7 +49,7 @@ def multi_benchmark_metrics():
                     reference_answer="",
                     test_answer="",
                     evaluation="",
-                    rating=5,
+                    ratings=[5],
                     rating_min=0,
                     rating_max=10,
                 )
@@ -63,7 +63,7 @@ def multi_benchmark_metrics():
                     reference_answer="",
                     test_answer="",
                     evaluation="",
-                    rating=9,
+                    ratings=[9],
                     rating_min=0,
                     rating_max=10,
                 )
@@ -77,7 +77,7 @@ def multi_benchmark_metrics():
                     reference_answer="",
                     test_answer="",
                     evaluation="",
-                    rating=7,
+                    ratings=[7],
                     rating_min=0,
                     rating_max=10,
                 )
@@ -91,7 +91,7 @@ def multi_benchmark_metrics():
                     reference_answer="",
                     test_answer="",
                     evaluation="",
-                    rating=None,
+                    ratings=[None],
                     rating_min=0,
                     rating_max=10,
                 )

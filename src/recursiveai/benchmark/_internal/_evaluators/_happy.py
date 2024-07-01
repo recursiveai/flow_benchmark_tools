@@ -17,5 +17,5 @@ class HappyEvaluator(BenchmarkEvaluator):
             reference_answer=reference_answer,
             test_answer=test_answer,
             evaluation="",
-            rating=self._rating,
+            ratings=[self._rating],
         )

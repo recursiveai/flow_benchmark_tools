@@ -19,3 +19,6 @@ dist
 
 # Python-specific
 __pycache__/
+
+# Example results
+data/results

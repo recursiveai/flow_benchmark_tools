@@ -42,6 +42,10 @@ class LLMJudgeEvaluator(BenchmarkEvaluator):
         super().__init__()
         self._model = model
 
+    @property
+    def llm_model(self) -> str:
+        return self._model.name
+
     async def evaluate(
         self, query: str, reference_answer: str, test_answer: str
     ) -> Evaluation:
@@ -71,7 +75,7 @@ class LLMJudgeEvaluator(BenchmarkEvaluator):
             reference_answer=reference_answer,
             test_answer=test_answer,
             evaluation=evaluation,
-            rating=rating,
+            ratings=[rating],
         )
 
     def _extract_rating(self, evaluation: str | None) -> int | None:

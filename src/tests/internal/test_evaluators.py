@@ -6,6 +6,7 @@ from recursiveai.benchmark._internal._evaluation import Evaluation
 from recursiveai.benchmark._internal._evaluators import get_evaluator
 from recursiveai.benchmark._internal._evaluators._happy import HappyEvaluator
 from recursiveai.benchmark._internal._evaluators._llm_judge import LLMJudgeEvaluator
+from recursiveai.benchmark._internal._evaluators._llm_jury import LLMJuryEvaluator
 from recursiveai.benchmark.api.benchmark_evaluator import Evaluator
 
 
@@ -14,6 +15,18 @@ def model_mock():
     model = Mock()
     model.name = "mock"
     return model
+
+
+@pytest.fixture
+def judges_mock(sample_evaluation):
+    judges = [Mock(), Mock(), Mock()]
+    judges[0].evaluate = AsyncMock(return_value=sample_evaluation)
+    judges[0].llm_model = "mock"
+    judges[1].evaluate = AsyncMock(return_value=sample_evaluation)
+    judges[1].llm_model = "mock"
+    judges[2].evaluate = AsyncMock(return_value=sample_evaluation)
+    judges[2].llm_model = "mock"
+    return judges
 
 
 def test_valid_rating(sample_evaluation):
@@ -28,7 +41,7 @@ def test_invalid_rating():
             reference_answer="",
             test_answer="",
             evaluation="",
-            rating=6,
+            ratings=[6],
             rating_min=0,
             rating_max=5,
         )
@@ -40,13 +53,43 @@ def test_none_rating():
         query="",
         reference_answer="",
         test_answer="",
-        evaluation="",
-        rating=None,
+        evaluation=None,
+        ratings=[None],
         rating_min=0,
         rating_max=5,
     )
 
     assert evaluation.rating is None
+
+
+def test_multiple_valid_ratings():
+    evaluation = Evaluation(
+        evaluator="",
+        query="",
+        reference_answer="",
+        test_answer="",
+        evaluation="",
+        ratings=[3, 4, 4],
+        rating_min=0,
+        rating_max=5,
+    )
+
+    assert evaluation.rating == 4
+
+
+def test_multiple_ratings_w_invalid():
+    evaluation = Evaluation(
+        evaluator="",
+        query="",
+        reference_answer="",
+        test_answer="",
+        evaluation="",
+        ratings=[3, 5, None],
+        rating_min=0,
+        rating_max=5,
+    )
+
+    assert evaluation.rating == 4
 
 
 @pytest.mark.asyncio
@@ -111,6 +154,20 @@ def test_get_gemini_1_5_pro_evaluator():
     assert evaluator._model.name == "gemini-1.5-pro"
 
 
+def test_get_gpt_claude_gemini_high_evaluator():
+    evaluator = get_evaluator(Evaluator.LLM_JURY_GPT_CLAUDE_GEMINI_HIGH)
+    assert isinstance(evaluator, LLMJuryEvaluator)
+    for judge in evaluator._judges:
+        assert isinstance(judge, LLMJudgeEvaluator)
+
+
+def test_get_gpt_claude_gemini_low_evaluator():
+    evaluator = get_evaluator(Evaluator.LLM_JURY_GPT_CLAUDE_GEMINI_LOW)
+    assert isinstance(evaluator, LLMJuryEvaluator)
+    for judge in evaluator._judges:
+        assert isinstance(judge, LLMJudgeEvaluator)
+
+
 def test_get_default_evaluator():
     evaluator = get_evaluator("test")
     assert isinstance(evaluator, LLMJudgeEvaluator)
@@ -143,3 +200,19 @@ async def test_llm_judge_evaluate_none(model_mock):
     evaluation = await evaluator.evaluate(query="", reference_answer="", test_answer="")
     assert evaluation.rating == None
     assert evaluation.evaluation == None
+
+
+@pytest.mark.asyncio
+async def test_llm_jury_evaluate_success(judges_mock, sample_evaluation):
+    jury = LLMJuryEvaluator(judge_models=[])
+    jury._judges = judges_mock
+    evaluation = await jury.evaluate(query="", reference_answer="", test_answer="")
+
+    assert len(evaluation.evaluation) == 3
+    assert len(evaluation.ratings) == 3
+    assert evaluation.ratings == [
+        sample_evaluation.rating,
+        sample_evaluation.rating,
+        sample_evaluation.rating,
+    ]
+    assert evaluation.rating == sample_evaluation.rating

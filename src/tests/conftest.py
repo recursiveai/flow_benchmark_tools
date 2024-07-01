@@ -13,7 +13,7 @@ def sample_evaluation():
         reference_answer="test_reference_answer",
         test_answer="test_test_answer",
         evaluation="test_evaluation",
-        rating=DEFAULT_TEST_RATING,
+        ratings=[DEFAULT_TEST_RATING],
         rating_min=0,
         rating_max=10,
     )
