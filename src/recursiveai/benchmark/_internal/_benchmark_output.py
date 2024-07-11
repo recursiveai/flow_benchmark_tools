@@ -10,7 +10,8 @@ class BenchmarkOutput(BaseModel):
     info: BenchmarkCase
     repeats: int = 1
     evaluations: list[Evaluation | None]
-    runtime: float | None = None
+    mean_case_runtime: float | None = None
+    total_runtime: float | None = None
 
     @computed_field
     @property

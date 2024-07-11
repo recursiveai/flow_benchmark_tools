@@ -64,21 +64,21 @@ class BenchmarkRunner:
         if self._parallel:
             outputs = await asyncio.gather(
                 *[
-                    self._execute_benchmark(
+                    self._execute_benchmark_case(
                         agent=run.agent,
-                        benchmark=benchmark,
+                        case=case,
                         idx=idx,
                         total=len(cases),
                     )
-                    for idx, benchmark in enumerate(cases)
+                    for idx, case in enumerate(cases)
                 ]
             )
         else:
             outputs = []
-            for idx, benchmark in enumerate(cases):
-                output = await self._execute_benchmark(
+            for idx, case in enumerate(cases):
+                output = await self._execute_benchmark_case(
                     agent=run.agent,
-                    benchmark=benchmark,
+                    case=case,
                     idx=idx,
                     total=len(cases),
                 )
@@ -88,28 +88,31 @@ class BenchmarkRunner:
             date=date, agent_name=run.agent.name, benchmark_outputs=outputs
         )
 
-    async def _execute_benchmark(
-        self, agent: BenchmarkAgent, benchmark: BenchmarkCase, idx: int, total: int
+    async def _execute_benchmark_case(
+        self, agent: BenchmarkAgent, case: BenchmarkCase, idx: int, total: int
     ) -> BenchmarkOutput:
         _logger.info(
             "Benchmark %s of %s: agent=%s benchmark=%s",
             idx + 1,
             total,
             agent.name,
-            benchmark,
+            case,
         )
         evaluations = []
+        case_runtimes = []
         start_time = time.time()
         for repeat in range(self._repeats):
             _logger.info("Repeat %s of %s", repeat + 1, self._repeats)
             evaluation = None
             try:
-                await agent.before_case(benchmark)
-                response = await agent.run_benchmark_case(benchmark)
+                await agent.before_case(case)
+                case_start_time = time.time()
+                response = await agent.run_benchmark_case(case)
+                case_end_time = time.time()
                 if response.exit_code == ExitCode.SUCCESS:
                     evaluation = await self._evaluator.evaluate(
-                        query=benchmark.query,
-                        reference_answer=benchmark.reference_answer,
+                        query=case.query,
+                        reference_answer=case.reference_answer,
                         test_answer=response.response,
                     )
                 else:
@@ -120,20 +123,30 @@ class BenchmarkRunner:
             except Exception:
                 _logger.exception("Caught exception while running benchmark")
 
+            else:
+                if response.exit_code == ExitCode.SUCCESS:
+                    case_runtimes.append(case_end_time - case_start_time)
+
             finally:
                 try:
-                    await agent.after_case(benchmark)
+                    await agent.after_case(case)
                 except Exception:
                     _logger.exception("Caught exception while running after_benchmark")
 
             evaluations.append(evaluation)
-        runtime = time.time() - start_time
+        total_runtime = time.time() - start_time
+
+        mean_case_runtime = None
+        if case_runtimes:
+            mean_case_runtime = sum(case_runtimes) / len(case_runtimes)
+
         return BenchmarkOutput(
             id=idx,
-            info=benchmark,
+            info=case,
             repeats=self._repeats,
             evaluations=evaluations,
-            runtime=runtime,
+            mean_case_runtime=mean_case_runtime,
+            total_runtime=total_runtime,
         )
 
     def _save_run_results_to_json(

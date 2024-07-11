@@ -31,7 +31,8 @@ def benchmark_outputs(benchmark_case_list, sample_evaluation):
                 sample_evaluation,
                 None,
             ],
-            runtime=1.0,
+            mean_case_runtime=0.3,
+            total_runtime=1.0,
         )
         benchmark_outputs.append(output)
     return benchmark_outputs
@@ -94,7 +95,8 @@ async def test_execute_run_sequential_success(benchmark_case_list):
         assert out.info == benchmark_case_list[idx]
         assert len(out.evaluations) == out.repeats
         assert all([evl.test_answer == "success" for evl in out.evaluations])
-        assert out.runtime is not None
+        assert out.total_runtime is not None and out.total_runtime > 0.0
+        assert out.mean_case_runtime is not None and out.mean_case_runtime > 0.0
         agent.before_case.assert_any_await(benchmark_case_list[idx])
         agent.after_case.assert_any_await(benchmark_case_list[idx])
 
@@ -121,7 +123,8 @@ async def test_execute_run_parallel_success(benchmark_case_list):
         assert out.info == benchmark_case_list[idx]
         assert len(out.evaluations) == out.repeats
         assert all([evl.test_answer == "success" for evl in out.evaluations])
-        assert out.runtime is not None
+        assert out.total_runtime is not None and out.total_runtime > 0.0
+        assert out.mean_case_runtime is not None and out.mean_case_runtime > 0.0
         agent.before_case.assert_any_await(benchmark_case_list[idx])
         agent.after_case.assert_any_await(benchmark_case_list[idx])
 
@@ -146,7 +149,8 @@ async def test_execute_run_failure_exit_code(benchmark_case_list):
         assert out.info == benchmark_case_list[idx]
         assert len(out.evaluations) == out.repeats
         assert all([evl is None for evl in out.evaluations])
-        assert out.runtime is not None
+        assert out.total_runtime is not None and out.total_runtime > 0.0
+        assert out.mean_case_runtime is None
         agent.before_case.assert_any_await(benchmark_case_list[idx])
         agent.after_case.assert_any_await(benchmark_case_list[idx])
 
@@ -169,7 +173,8 @@ async def test_execute_run_failure_exception(benchmark_case_list):
         assert out.info == benchmark_case_list[idx]
         assert len(out.evaluations) == out.repeats
         assert all([evl is None for evl in out.evaluations])
-        assert out.runtime is not None
+        assert out.total_runtime is not None and out.total_runtime > 0.0
+        assert out.mean_case_runtime is None
         agent.before_case.assert_any_await(benchmark_case_list[idx])
         agent.after_case.assert_any_await(benchmark_case_list[idx])
 
