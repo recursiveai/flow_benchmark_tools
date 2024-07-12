@@ -1,4 +1,5 @@
 # Copyright 2024 Recursive AI
+
 from ..benchmark import Benchmark
 from ..benchmark_agent import BenchmarkAgent
 from ..benchmark_case import BenchmarkCase

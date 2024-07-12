@@ -1,3 +1,5 @@
+# Copyright 2024 Recursive AI
+
 import pytest
 
 from recursiveai.benchmark.api import BenchmarkCase

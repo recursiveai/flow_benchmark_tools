@@ -1,3 +1,5 @@
+# Copyright 2024 Recursive AI
+
 from abc import ABC, abstractmethod
 
 from .benchmark import Benchmark

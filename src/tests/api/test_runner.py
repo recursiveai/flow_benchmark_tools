@@ -1,3 +1,5 @@
+# Copyright 2024 Recursive AI
+
 import datetime
 import json
 import os

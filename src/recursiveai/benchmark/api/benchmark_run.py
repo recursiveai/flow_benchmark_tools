@@ -1,3 +1,5 @@
+# Copyright 2024 Recursive AI
+
 from dataclasses import dataclass
 
 from .benchmark import Benchmark
