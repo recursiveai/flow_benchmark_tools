@@ -20,10 +20,9 @@ _logger = logging.getLogger(__name__)
 
 
 _SYSTEM_PROMPT = (
-    "You are an assistant for question-answering tasks. "
-    "If you don't know the answer, say that you "
-    "don't know. Use three sentences maximum and keep the "
-    "answer concise."
+    "You are an assistant for question-answering tasks.\n"
+    "If you don't know the answer, say that you don't know.\n"
+    "Use three sentences maximum and keep the answer concise.\n"
 )
 
 
@@ -54,36 +53,39 @@ class OpenAIAssistantBenchmarkAgent(BenchmarkAgent):
             _logger.error("No documents were specified for benchmark case: %s", case)
             return BenchmarkCaseResponse(response=None, exit_code=ExitCode.FAILED)
 
-        files: list[FileObject] = []
-        file_map: dict[str, str] = {}
-        attachments: list[dict] = []
-        for doc in documents:
-            with open(f"data/files/{doc}", "rb") as base_file:
-                file = await self._client.files.create(
-                    file=base_file, purpose="assistants"
-                )
-
-            if file:
-                file_map[file.id] = doc
-                files.append(file)
-                attachments.append(
-                    {
-                        "file_id": file.id,
-                        "tools": [{"type": "file_search"}],
-                    }
-                )
-
-        thread = await self._client.beta.threads.create(
-            messages=[
-                {
-                    "role": "user",
-                    "content": case.query,
-                    "attachments": attachments,
-                }
-            ]
-        )
-
         try:
+            files: list[FileObject] = []
+            file_map: dict[str, str] = {}
+            for doc in documents:
+                with open(f"data/files/{doc}", "rb") as base_file:
+                    file = await self._client.files.create(
+                        file=base_file, purpose="assistants"
+                    )
+
+                if file:
+                    file_map[file.id] = doc
+                    files.append(file)
+
+            vector_store = await self._client.beta.vector_stores.create(
+                name="benchmark_files",
+                expires_after={"anchor": "last_active_at", "days": 1},
+            )
+
+            await self._client.beta.vector_stores.file_batches.create_and_poll(
+                vector_store_id=vector_store.id,
+                file_ids=[file.id for file in files],
+            )
+
+            thread = await self._client.beta.threads.create(
+                messages=[
+                    {
+                        "role": "user",
+                        "content": case.query,
+                    }
+                ],
+                tool_resources={"file_search": {"vector_store_ids": [vector_store.id]}},
+            )
+
             run = await self._client.beta.threads.runs.create_and_poll(
                 thread_id=thread.id,
                 assistant_id=self._assistant.id,
@@ -127,7 +129,7 @@ if __name__ == "__main__":
 
     runner = BenchmarkRunner(
         runs=run,
-        evaluator=Evaluator.LLM_JUDGE_GEMINI_1_5_PRO,
+        evaluator=Evaluator.LLM_JURY_GPT_CLAUDE_GEMINI_LOW,
         results_folder="data/results",
         repeats=1,
         parallel=True,
