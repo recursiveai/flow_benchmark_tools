@@ -7,7 +7,7 @@ name = "flow-benchmark-tools"
 version = "1.0.0"
 description = "A library containing LLM benchmarking tools"
 readme = "README.md"
-requires-python=">=3.9,<3.12"
+requires-python=">=3.8,<3.12"
 dynamic = ["dependencies", "optional-dependencies"]
 
 [tool.setuptools.packages.find]
