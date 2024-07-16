@@ -3,8 +3,6 @@
 .DEFAULT_GOAL := help
 .PHONY: install pre-commit pytest check pylint pyright bandit style black isort build publish help
 
-# Set environment variable TARGET_REPO for publishing purposes
-
 install: ## Install/Upgrade all dependencies in editable mode
 	pip install --upgrade -e '.[dev,pub,examples]'
 
@@ -43,7 +41,7 @@ build: ## Build package into dist folder and check artifacts
 	python -m twine check dist/*
 
 publish: ## Publish artifacts to private pypi repository
-	python -m twine upload --repository-url $(TARGET_REPO) dist/*
+	python -m twine upload --repository pypi dist/*
 
 help: # Run `make help` to get help on the make commands
 	@echo "\033[36mAvailable commands:\033[0m"
