@@ -1,3 +1,5 @@
+# Copyright 2024 Recursive AI
+
 from pydantic import BaseModel, computed_field
 
 from ._benchmark_output import BenchmarkOutput

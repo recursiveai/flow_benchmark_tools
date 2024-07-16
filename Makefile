@@ -1,3 +1,5 @@
+# Copyright 2024 Recursive AI
+
 .DEFAULT_GOAL := help
 .PHONY: install pre-commit pytest check pylint pyright bandit style black isort build publish help
 

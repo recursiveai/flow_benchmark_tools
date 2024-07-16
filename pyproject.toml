@@ -3,8 +3,8 @@ requires = ["setuptools>=69", "setuptools-scm>=8"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "recursiveai-benchmark-lab"
-version = "0.1.15"
+name = "flow-benchmark-tools"
+version = "1.0.0"
 description = "A library containing LLM benchmarking tools"
 readme = "README.md"
 requires-python=">=3.8,<3.12"

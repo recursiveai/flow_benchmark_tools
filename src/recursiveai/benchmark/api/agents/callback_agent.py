@@ -1,3 +1,5 @@
+# Copyright 2024 Recursive AI
+
 import logging
 from typing import Callable
 

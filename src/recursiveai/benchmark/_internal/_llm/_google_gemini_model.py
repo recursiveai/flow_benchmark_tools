@@ -1,3 +1,5 @@
+# Copyright 2024 Recursive AI
+
 import logging
 from functools import cached_property
 from typing import AsyncIterable

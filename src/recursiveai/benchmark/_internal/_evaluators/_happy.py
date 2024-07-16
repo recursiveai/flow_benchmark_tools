@@ -1,3 +1,5 @@
+# Copyright 2024 Recursive AI
+
 from .._benchmark_evaluator import BenchmarkEvaluator
 from .._evaluation import Evaluation
 

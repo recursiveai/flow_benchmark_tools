@@ -1,3 +1,5 @@
+# Copyright 2024 Recursive AI
+
 from functools import cached_property
 
 import numpy as np

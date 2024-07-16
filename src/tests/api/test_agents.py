@@ -1,3 +1,5 @@
+# Copyright 2024 Recursive AI
+
 from unittest.mock import AsyncMock, Mock
 
 import pytest

@@ -1,3 +1,5 @@
+# Copyright 2024 Recursive AI
+
 from typing import Any
 
 import numpy as np

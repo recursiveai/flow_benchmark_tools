@@ -1,3 +1,5 @@
+# Copyright 2024 Recursive AI
+
 import asyncio
 
 from .._benchmark_evaluator import BenchmarkEvaluator
