@@ -19,6 +19,7 @@ from .exit_code import ExitCode
 _logger = logging.getLogger(__name__)
 
 _MAX_NUM_REPEATS = 20
+_MAX_CONCURRENT_CASES = 1000
 
 _DEFAULT_RESULTS_FOLDER = "benchmark/results/"
 
@@ -32,6 +33,7 @@ class BenchmarkRunner:
         results_file="",
         repeats: int = 1,
         parallel: bool = False,
+        max_concurrency: int = _MAX_CONCURRENT_CASES,
     ) -> None:
         if isinstance(runs, list):
             self._runs = runs
@@ -52,6 +54,7 @@ class BenchmarkRunner:
         else:
             self._repeats = repeats
         self._parallel = parallel
+        self._semaphore = asyncio.Semaphore(max_concurrency)
 
     async def run(self) -> None:
         start_time = time.time()
@@ -93,63 +96,66 @@ class BenchmarkRunner:
     async def _execute_benchmark_case(
         self, agent: BenchmarkAgent, case: BenchmarkCase, idx: int, total: int
     ) -> BenchmarkOutput:
-        _logger.info(
-            "Benchmark %s of %s: agent=%s benchmark=%s",
-            idx + 1,
-            total,
-            agent.name,
-            case,
-        )
-        evaluations = []
-        case_runtimes = []
-        start_time = time.time()
-        for repeat in range(self._repeats):
-            _logger.info("Repeat %s of %s", repeat + 1, self._repeats)
-            evaluation = None
-            try:
-                await agent.before_case(case)
-                case_start_time = time.time()
-                response = await agent.run_benchmark_case(case)
-                case_end_time = time.time()
-                if response.exit_code == ExitCode.SUCCESS:
-                    evaluation = await self._evaluator.evaluate(
-                        query=case.query,
-                        reference_answer=case.reference_answer,
-                        test_answer=response.response,
-                    )
-                else:
-                    _logger.error(
-                        "Benchmark exit_code is not SUCCESS: %s", response.exit_code
-                    )
-
-            except Exception:
-                _logger.exception("Caught exception while running benchmark")
-
-            else:
-                if response.exit_code == ExitCode.SUCCESS:
-                    case_runtimes.append(case_end_time - case_start_time)
-
-            finally:
+        async with self._semaphore:
+            _logger.info(
+                "Benchmark %s of %s: agent=%s benchmark=%s",
+                idx + 1,
+                total,
+                agent.name,
+                case,
+            )
+            evaluations = []
+            case_runtimes = []
+            start_time = time.time()
+            for repeat in range(self._repeats):
+                _logger.info("Repeat %s of %s", repeat + 1, self._repeats)
+                evaluation = None
                 try:
-                    await agent.after_case(case)
+                    await agent.before_case(case)
+                    case_start_time = time.time()
+                    response = await agent.run_benchmark_case(case)
+                    case_end_time = time.time()
+                    if response.exit_code == ExitCode.SUCCESS:
+                        evaluation = await self._evaluator.evaluate(
+                            query=case.query,
+                            reference_answer=case.reference_answer,
+                            test_answer=response.response,
+                        )
+                    else:
+                        _logger.error(
+                            "Benchmark exit_code is not SUCCESS: %s", response.exit_code
+                        )
+
                 except Exception:
-                    _logger.exception("Caught exception while running after_benchmark")
+                    _logger.exception("Caught exception while running benchmark")
 
-            evaluations.append(evaluation)
-        total_runtime = time.time() - start_time
+                else:
+                    if response.exit_code == ExitCode.SUCCESS:
+                        case_runtimes.append(case_end_time - case_start_time)
 
-        mean_case_runtime = None
-        if case_runtimes:
-            mean_case_runtime = sum(case_runtimes) / len(case_runtimes)
+                finally:
+                    try:
+                        await agent.after_case(case)
+                    except Exception:
+                        _logger.exception(
+                            "Caught exception while running after_benchmark"
+                        )
 
-        return BenchmarkOutput(
-            id=idx,
-            info=case,
-            repeats=self._repeats,
-            evaluations=evaluations,
-            mean_case_runtime=mean_case_runtime,
-            total_runtime=total_runtime,
-        )
+                evaluations.append(evaluation)
+            total_runtime = time.time() - start_time
+
+            mean_case_runtime = None
+            if case_runtimes:
+                mean_case_runtime = sum(case_runtimes) / len(case_runtimes)
+
+            return BenchmarkOutput(
+                id=idx,
+                info=case,
+                repeats=self._repeats,
+                evaluations=evaluations,
+                mean_case_runtime=mean_case_runtime,
+                total_runtime=total_runtime,
+            )
 
     def _save_run_results_to_json(
         self, results: list[RunOutput], runtime: float | None = None
