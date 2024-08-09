@@ -1,6 +1,6 @@
 # Copyright 2024 Recursive AI
 
-from typing import Any
+from typing import Any, Optional
 
 import numpy as np
 from pydantic import BaseModel, computed_field, model_validator
@@ -12,11 +12,11 @@ class Evaluation(BaseModel):
     query: str
     reference_answer: str
     test_answer: str
-    evaluation: str | list[str] | None
-    ratings: list[int | None]
+    evaluation: Optional[str] | list[Optional[str]]
+    ratings: list[Optional[int]]
     rating_min: int = 1
     rating_max: int = 10
-    extras: dict[str, Any] | None = None
+    extras: Optional[dict[str, Any]] = None
 
     @computed_field
     @property
