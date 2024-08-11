@@ -108,6 +108,24 @@ def test_get_happy_evaluator():
     assert isinstance(evaluator, HappyEvaluator)
 
 
+
+def test_get_azure_gpt_3_5_turbo_evaluator():
+    evaluator = get_evaluator(Evaluator.LLM_JUDGE_AZURE_GPT_3_5_TURBO)
+    assert isinstance(evaluator, LLMJudgeEvaluator)
+    assert evaluator._model.name == "gpt-3.5-turbo"
+
+
+def test_get_azure_gpt_4_turbo_preview_evaluator():
+    evaluator = get_evaluator(Evaluator.LLM_JUDGE_AZURE_GPT_4_TURBO_PREVIEW)
+    assert isinstance(evaluator, LLMJudgeEvaluator)
+    assert evaluator._model.name == "gpt-4-turbo-preview"
+
+
+def test_get_azure_gpt_4_o_evaluator():
+    evaluator = get_evaluator(Evaluator.LLM_JUDGE_AZURE_GPT_4_0)
+    assert isinstance(evaluator, LLMJudgeEvaluator)
+    assert evaluator._model.name == "gpt-4o"
+
 def test_get_gpt_3_5_turbo_evaluator():
     evaluator = get_evaluator(Evaluator.LLM_JUDGE_GPT_3_5_TURBO)
     assert isinstance(evaluator, LLMJudgeEvaluator)
