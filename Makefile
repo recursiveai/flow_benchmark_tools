@@ -12,7 +12,7 @@ pre-commit: ## Install pre-commit
 
 ## Testing ##
 pytest: ## Execute unit tests with pytest
-	python -m pytest -s
+	python -m pytest -s -n auto
 
 ## Code checks ##
 check: pylint pyright bandit ## Run pylint, pyright and bandit
