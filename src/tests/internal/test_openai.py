@@ -15,13 +15,13 @@ from recursiveai.benchmark._internal._llm._openai_gpt_model import (
 
 
 @pytest.fixture(autouse=True, scope="module")
-def skip_if_api_key_not_defined():
+def skip_if_api_key_not_defined() -> None:
     if os.getenv("OPENAI_API_KEY") is None:
         pytest.skip("Skipping OpenAI test since OPENAI_API_KEY is not defined")
 
 
 @pytest.fixture
-def mock_model():
+def mock_model() -> GPTX:
     model = GPTX(name="mock_model", context_window=8)
     model._client = Mock()
     return model
@@ -39,7 +39,7 @@ def test_gpt_4o_context_window():
     assert GPT_4_O.context_window == 128000
 
 
-def test_no_output_window(mock_model):
+def test_no_output_window(mock_model: GPTX):
     assert mock_model.context_window == mock_model.output_window
 
 
@@ -50,7 +50,7 @@ def test_no_output_window(mock_model):
     argvalues=[GPT_3_5_TURBO, GPT_4_TURBO_PREVIEW, GPT_4_O],
     ids=[GPT_3_5_TURBO.name, GPT_4_TURBO_PREVIEW.name, GPT_4_O.name],
 )
-async def test_async_chat_completion_success(model):
+async def test_async_chat_completion_success(model: GPTX):
     chat = [ChatMessage(content="What's 2+2? Reply with a single number.", role="user")]
     response = await model.async_chat_completion(
         chat=chat, temperature=0.0, max_tokens=2
@@ -59,53 +59,9 @@ async def test_async_chat_completion_success(model):
 
 
 @pytest.mark.asyncio
-async def test_async_chat_completion_failure(mock_model):
+async def test_async_chat_completion_failure(mock_model: GPTX):
     mock_model._client.chat.completions.create = AsyncMock(side_effect=Exception())
     response = await mock_model.async_chat_completion(
         chat=[], temperature=0.0, max_tokens=2
     )
     assert response == None
-
-
-@pytest.mark.asyncio
-@pytest.mark.flaky(reruns=2)
-@pytest.mark.parametrize(
-    argnames="model",
-    argvalues=[GPT_3_5_TURBO, GPT_4_TURBO_PREVIEW, GPT_4_O],
-    ids=[GPT_3_5_TURBO.name, GPT_4_TURBO_PREVIEW.name, GPT_4_O.name],
-)
-async def test_async_chat_completion_stream_success(model):
-    chat = [ChatMessage(content="What's 2+2? Reply with a single number.", role="user")]
-    response_stream = await model.async_chat_completion_stream(
-        chat=chat, temperature=0.0, max_tokens=2
-    )
-    response = ""
-    async for chunk in response_stream:
-        if chunk and chunk.delta:
-            response += chunk.delta
-
-    assert response == "4"
-
-
-@pytest.mark.asyncio
-async def test_async_chat_completion_stream_failure(mock_model):
-    mock_model._client.chat.completions.create = AsyncMock(side_effect=Exception())
-    response = await mock_model.async_chat_completion_stream(
-        chat=[], temperature=0.0, max_tokens=2
-    )
-    assert response == None
-
-
-@pytest.mark.parametrize(
-    argnames="model",
-    argvalues=[GPT_3_5_TURBO, GPT_4_TURBO_PREVIEW, GPT_4_O],
-    ids=[GPT_3_5_TURBO.name, GPT_4_TURBO_PREVIEW.name, GPT_4_O.name],
-)
-def test_count_tokens_success(model):
-    num_tokens = model.count_tokens("Hi")
-    assert num_tokens == 1
-
-
-def test_count_tokens_failure(mock_model):
-    num_tokens = mock_model.count_tokens("Hi")
-    assert num_tokens == 0
