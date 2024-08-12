@@ -5,10 +5,12 @@ from typing import Literal, Optional
 
 from pydantic import BaseModel
 
+Role = Literal["system", "user", "assistant"]
+
 
 class ChatMessage(BaseModel):
     content: str
-    role: Literal["user", "assistant", "system"]
+    role: Role
 
 
 class LLMModel(ABC):

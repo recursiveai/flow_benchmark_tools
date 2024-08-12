@@ -51,7 +51,12 @@ def test_no_output_window(mock_model: GPTX):
     ids=[GPT_3_5_TURBO.name, GPT_4_TURBO_PREVIEW.name, GPT_4_O.name],
 )
 async def test_async_chat_completion_success(model: GPTX):
-    chat = [ChatMessage(content="What's 2+2? Reply with a single number.", role="user")]
+    chat = [
+        ChatMessage(content="You are an AI assistant.", role="system"),
+        ChatMessage(content="Very brief responses, ok?", role="user"),
+        ChatMessage(content="OK", role="assistant"),
+        ChatMessage(content="What's 2+2? Reply with a single number.", role="user"),
+    ]
     response = await model.async_chat_completion(
         chat=chat, temperature=0.0, max_tokens=2
     )

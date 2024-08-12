@@ -22,3 +22,6 @@ __pycache__/
 
 # Example results
 data/results
+
+# Build folder
+build/

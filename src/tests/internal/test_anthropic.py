@@ -47,6 +47,8 @@ def test_no_output_window(mock_model: AnthropicClaude):
 async def test_async_chat_completion_success(model: AnthropicClaude):
     chat = [
         ChatMessage(content="You are an AI assistant.", role="system"),
+        ChatMessage(content="Very brief responses, ok?", role="user"),
+        ChatMessage(content="OK", role="assistant"),
         ChatMessage(content="What's 2+2? Reply with a single number.", role="user"),
     ]
     response = await model.async_chat_completion(
