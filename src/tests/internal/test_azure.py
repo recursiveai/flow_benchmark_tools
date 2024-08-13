@@ -14,10 +14,13 @@ from recursiveai.benchmark._internal._llm._azure_openai_gpt_model import (
 
 @pytest.fixture(autouse=True, scope="module")
 def skip_if_api_key_not_defined():
-    if os.getenv("OPENAI_API_KEY") is None:
-        pytest.skip("Skipping Azure OpenAI test since OPENAI_API_KEY is not defined")
+    if os.getenv("AZURE_OPENAI_API_KEY") is None:
+        pytest.skip("Skipping Azure OpenAI test since AZURE_OPENAI_API_KEY is not defined")
     if os.getenv("AZURE_OPENAI_DEPLOYMENT") is None:
         pytest.skip("Skipping Azure OpenAI test since AZURE_OPENAI_DEPLOYMENT is not defined")
+    if os.getenv("AZURE_OPENAI_ENDPOINT") is None:
+        pytest.skip("Skipping Azure OpenAI test since AZURE_OPENAI_ENDPOINT is not defined")
+
 
 
 @pytest.fixture
