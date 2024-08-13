@@ -108,6 +108,10 @@ def test_get_happy_evaluator():
     assert isinstance(evaluator, HappyEvaluator)
 
 
+def test_get_azure_gpt():
+    evaluator = get_evaluator(Evaluator.LLM_JUDGE_AZURE_GPT)
+    assert isinstance(evaluator, LLMJudgeEvaluator)
+
 def test_get_gpt_3_5_turbo_evaluator():
     evaluator = get_evaluator(Evaluator.LLM_JUDGE_GPT_3_5_TURBO)
     assert isinstance(evaluator, LLMJudgeEvaluator)

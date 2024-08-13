@@ -17,3 +17,5 @@ class Evaluator(str, Enum):
 
     LLM_JURY_GPT_CLAUDE_GEMINI_HIGH = "llm_jury_gpt_claude_gemini_high"
     LLM_JURY_GPT_CLAUDE_GEMINI_LOW = "llm_jury_gpt_claude_gemini_low"
+
+    LLM_JUDGE_AZURE_GPT='llm_judge_azure-gpt'
