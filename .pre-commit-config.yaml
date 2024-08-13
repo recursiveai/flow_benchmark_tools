@@ -32,4 +32,4 @@ repos:
         types: [python]
         pass_filenames: false
         always_run: true
-        args: ["src/tests"]
+        args: ["-n", "auto", "src/tests"]

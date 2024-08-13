@@ -1,53 +1,43 @@
 # Copyright 2024 Recursive AI
 
 import logging
-from functools import cached_property
-from typing import AsyncIterable
+from typing import Optional
 
+from google.api_core.exceptions import (
+    DeadlineExceeded,
+    InternalServerError,
+    ResourceExhausted,
+    ServiceUnavailable,
+)
 from google.generativeai import GenerativeModel
-from google.generativeai.types import HarmBlockThreshold, HarmCategory
+from google.generativeai.types import (
+    AsyncGenerateContentResponse,
+    ContentDict,
+    GenerationConfig,
+    HarmBlockThreshold,
+    HarmCategory,
+)
 
-from ._llm_model import ChatMessage, ChatResponseChunk, LLMModel
+from .._util import async_retry
+from ._llm_model import ChatMessage, LLMModel
 
 _logger = logging.getLogger(__name__)
 
 
 class GoogleGemini(LLMModel):
-    def __init__(self, name: str, context_window: int, output_window: int = -1):
-        self._name = name
-        self._context_window = context_window
-        if output_window < 0:
-            self._output_window = context_window
-        else:
-            self._output_window = output_window
 
-        self._safety_settings = {
+    def _client(self, system_prompt: Optional[str] = None) -> GenerativeModel:
+        safety_settings = {
             HarmCategory.HARM_CATEGORY_HARASSMENT: HarmBlockThreshold.BLOCK_NONE,
             HarmCategory.HARM_CATEGORY_HATE_SPEECH: HarmBlockThreshold.BLOCK_NONE,
             HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT: HarmBlockThreshold.BLOCK_NONE,
             HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT: HarmBlockThreshold.BLOCK_NONE,
         }
-
-    @property
-    def name(self) -> str:
-        return self._name
-
-    @property
-    def context_window(self) -> int:
-        return self._context_window
-
-    @property
-    def output_window(self) -> int:
-        return self._output_window
-
-    @cached_property
-    def _client(self) -> GenerativeModel:
         return GenerativeModel(
-            model_name=self._name, safety_settings=self._safety_settings
+            model_name=self._name,
+            safety_settings=safety_settings,
+            system_instruction=system_prompt,
         )
-
-    def count_tokens(self, message: str) -> int:
-        return self._client.count_tokens(message).total_tokens
 
     async def async_chat_completion(
         self,
@@ -55,29 +45,20 @@ class GoogleGemini(LLMModel):
         **kwargs,
     ) -> str | None:
         temperature = kwargs.get("temperature", 0.0)
-        max_tokens = kwargs.get("max_tokens", 1024)
+        max_tokens = kwargs.get("max_tokens", self._output_window)
         timeout = kwargs.get("timeout", 60)
 
-        messages = []
-        for msg in chat:
-            match (msg.role):
-                case "system":
-                    messages.append({"role": "user", "parts": [msg.content]})
-                    messages.append({"role": "model", "parts": ["OK"]})
-                case "user":
-                    messages.append({"role": "user", "parts": [msg.content]})
-                case "assistant":
-                    messages.append({"role": "model", "parts": [msg.content]})
+        (system, messages) = await self._convert_chat_to_messages(chat)
+
+        config = GenerationConfig(
+            temperature=temperature,
+            max_output_tokens=max_tokens,
+            candidate_count=1,
+        )
 
         try:
-            response = await self._client.generate_content_async(
-                contents=messages,
-                generation_config={
-                    "temperature": temperature,
-                    "max_output_tokens": max_tokens,
-                },
-                request_options={"timeout": timeout},
-                stream=False,
+            response: AsyncGenerateContentResponse = await self._completion(
+                messages, system, config, timeout
             )
         except Exception:
             _logger.exception("Caught exception while running async_chat_completion")
@@ -85,45 +66,43 @@ class GoogleGemini(LLMModel):
 
         return response.text
 
-    async def async_chat_completion_stream(
+    @async_retry(
+        exc_tuple=(
+            DeadlineExceeded,
+            ResourceExhausted,
+            InternalServerError,
+            ServiceUnavailable,
+        )
+    )
+    async def _completion(
         self,
-        chat: list[ChatMessage],
-        **kwargs,
-    ) -> AsyncIterable[ChatResponseChunk] | None:
-        temperature = kwargs.get("temperature", 0.0)
-        max_tokens = kwargs.get("max_tokens", 1024)
-        timeout = kwargs.get("timeout", 60)
+        messages: list[ContentDict],
+        system_prompt: str,
+        config: GenerationConfig,
+        timeout: float,
+    ) -> AsyncGenerateContentResponse:
+        return await self._client(system_prompt).generate_content_async(
+            contents=messages,
+            generation_config=config,
+            request_options={"timeout": timeout},
+            stream=False,
+        )
 
+    async def _convert_chat_to_messages(
+        self, chat: list[ChatMessage]
+    ) -> tuple[str, list[ContentDict]]:
+        system = ""
         messages = []
         for msg in chat:
-            match (msg.role):
+            match msg.role:
                 case "system":
-                    messages.append({"role": "user", "parts": [msg.content]})
-                    messages.append({"role": "model", "parts": ["OK"]})
-                case "user":
-                    messages.append({"role": "user", "parts": [msg.content]})
+                    system = msg.content
                 case "assistant":
-                    messages.append({"role": "model", "parts": [msg.content]})
+                    messages.append(ContentDict(role="model", parts=[msg.content]))
+                case "user":
+                    messages.append(ContentDict(role="user", parts=[msg.content]))
 
-        try:
-            response = await self._client.generate_content_async(
-                contents=messages,
-                generation_config={
-                    "temperature": temperature,
-                    "max_output_tokens": max_tokens,
-                },
-                request_options={"timeout": timeout},
-                stream=True,
-            )
-        except Exception:
-            _logger.exception("Caught exception while running async_chat_completion")
-            return None
-
-        async def response_stream():
-            async for content in response:
-                yield ChatResponseChunk(delta=content.text, finish_reason=None)
-
-        return response_stream()
+        return (system, messages)
 
 
 GEMINI_1_5_FLASH = GoogleGemini(

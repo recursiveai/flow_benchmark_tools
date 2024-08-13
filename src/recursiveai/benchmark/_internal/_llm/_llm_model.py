@@ -1,43 +1,40 @@
 # Copyright 2024 Recursive AI
 
 from abc import ABC, abstractmethod
-from typing import AsyncIterable, Literal
+from typing import Literal, Optional
 
-from pydantic import BaseModel, ConfigDict
+from pydantic import BaseModel
+
+Role = Literal["system", "user", "assistant"]
 
 
 class ChatMessage(BaseModel):
     content: str
-    role: Literal["user", "assistant", "system"]
-
-
-class ChatResponseChunk(BaseModel):
-    delta: str | None = None
-    finish_reason: str | None = None
-
-    model_config = ConfigDict()
+    role: Role
 
 
 class LLMModel(ABC):
+    def __init__(
+        self, name: str, context_window: int, output_window: Optional[int] = None
+    ):
+        self._name = name
+        self._context_window = context_window
+        if output_window and output_window > 0:
+            self._output_window = output_window
+        else:
+            self._output_window = context_window
 
     @property
-    @abstractmethod
     def name(self) -> str:
-        raise NotImplementedError()
+        return self._name
 
     @property
-    @abstractmethod
     def context_window(self) -> int:
-        raise NotImplementedError()
+        return self._context_window
 
     @property
-    @abstractmethod
     def output_window(self) -> int:
-        raise NotImplementedError()
-
-    @abstractmethod
-    def count_tokens(self, message: str) -> int:
-        raise NotImplementedError()
+        return self._output_window
 
     @abstractmethod
     async def async_chat_completion(
@@ -45,12 +42,4 @@ class LLMModel(ABC):
         chat: list[ChatMessage],
         **kwargs,
     ) -> str | None:
-        raise NotImplementedError()
-
-    @abstractmethod
-    async def async_chat_completion_stream(
-        self,
-        chat: list[ChatMessage],
-        **kwargs,
-    ) -> AsyncIterable[ChatResponseChunk] | None:
         raise NotImplementedError()
