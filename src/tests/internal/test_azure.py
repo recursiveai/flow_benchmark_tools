@@ -25,7 +25,7 @@ def skip_if_api_key_not_defined():
 
 @pytest.fixture
 def mock_model():
-    model = AzureGPTX(name="mock_model", context_window=8)
+    model = AzureGPTX(context_window=8)
     model._client = Mock()
     return model
 
