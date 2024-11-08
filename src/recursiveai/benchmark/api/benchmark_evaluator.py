@@ -18,3 +18,6 @@ class Evaluator(str, Enum):
 
     LLM_JURY_GPT_CLAUDE_GEMINI_HIGH = "llm_jury_gpt_claude_gemini_high"
     LLM_JURY_GPT_CLAUDE_GEMINI_LOW = "llm_jury_gpt_claude_gemini_low"
+
+    STRICT_MATCH = "strict_match"
+    REGEX_MATCH = "regex_match"

@@ -9,6 +9,10 @@ from recursiveai.benchmark._internal._evaluators import get_evaluator
 from recursiveai.benchmark._internal._evaluators._happy import HappyEvaluator
 from recursiveai.benchmark._internal._evaluators._llm_judge import LLMJudgeEvaluator
 from recursiveai.benchmark._internal._evaluators._llm_jury import LLMJuryEvaluator
+from recursiveai.benchmark._internal._evaluators._regex_match import RegexMatchEvaluator
+from recursiveai.benchmark._internal._evaluators._strict_match import (
+    StrictMatchEvaluator,
+)
 from recursiveai.benchmark.api.benchmark_evaluator import Evaluator
 
 
@@ -20,7 +24,7 @@ def model_mock():
 
 
 @pytest.fixture
-def judges_mock(sample_evaluation):
+def judges_mock(sample_evaluation: Evaluation):
     judges = [Mock(), Mock(), Mock()]
     judges[0].evaluate = AsyncMock(return_value=sample_evaluation)
     judges[0].llm_model = "mock"
@@ -31,7 +35,7 @@ def judges_mock(sample_evaluation):
     return judges
 
 
-def test_valid_rating(sample_evaluation):
+def test_valid_rating(sample_evaluation: Evaluation):
     assert sample_evaluation.rating == 7
 
 
@@ -175,6 +179,16 @@ def test_get_gpt_claude_gemini_low_evaluator():
         assert isinstance(judge, LLMJudgeEvaluator)
 
 
+def test_get_strict_match_evaluator():
+    evaluator = get_evaluator(Evaluator.STRICT_MATCH)
+    assert isinstance(evaluator, StrictMatchEvaluator)
+
+
+def test_get_regex_match_evaluator():
+    evaluator = get_evaluator(Evaluator.REGEX_MATCH)
+    assert isinstance(evaluator, RegexMatchEvaluator)
+
+
 def test_get_default_evaluator():
     evaluator = get_evaluator("test")
     assert isinstance(evaluator, LLMJudgeEvaluator)
@@ -223,3 +237,66 @@ async def test_llm_jury_evaluate_success(judges_mock, sample_evaluation):
         sample_evaluation.rating,
     ]
     assert evaluation.rating == sample_evaluation.rating
+
+
+@pytest.mark.asyncio
+async def test_strict_match_evaluator_success():
+    evaluator = StrictMatchEvaluator()
+    evaluation = await evaluator.evaluate(
+        query="query", reference_answer="answer", test_answer="answer"
+    )
+    assert evaluation.rating == 10
+
+
+@pytest.mark.asyncio
+async def test_strict_match_evaluator_failure():
+    evaluator = StrictMatchEvaluator()
+    evaluation = await evaluator.evaluate(
+        query="query", reference_answer="answer", test_answer="Answer"
+    )
+    assert evaluation.rating == 1
+
+
+@pytest.mark.asyncio
+async def test_regex_match_evaluate_single_word():
+    evaluator = RegexMatchEvaluator()
+
+    evaluation = await evaluator.evaluate(
+        query="query", reference_answer="answer", test_answer="answer"
+    )
+    assert evaluation.rating == 10
+
+    evaluation = await evaluator.evaluate(
+        query="query", reference_answer="answer", test_answer="Answer"
+    )
+    assert evaluation.rating == 1
+
+
+@pytest.mark.asyncio
+async def test_regex_match_evaluate_multiple_words():
+    evaluator = RegexMatchEvaluator()
+
+    evaluation = await evaluator.evaluate(
+        query="query", reference_answer="a|b|c", test_answer="c"
+    )
+    assert evaluation.rating == 10
+
+    evaluation = await evaluator.evaluate(
+        query="query", reference_answer="a|b|c", test_answer="d"
+    )
+    assert evaluation.rating == 1
+
+
+@pytest.mark.asyncio
+async def test_regex_match_evaluate_number():
+    evaluator = RegexMatchEvaluator()
+
+    evaluation = await evaluator.evaluate(
+        query="query", reference_answer="\\d+", test_answer="42"
+    )
+    assert evaluation.rating == 10
+
+    evaluation = await evaluator.evaluate(
+        query="query", reference_answer="\\d+", test_answer="answer"
+    )
+    assert evaluation.rating == 1

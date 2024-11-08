@@ -8,7 +8,7 @@ DEFAULT_TEST_RATING = 7
 
 
 @pytest.fixture
-def sample_evaluation():
+def sample_evaluation() -> Evaluation:
     return Evaluation(
         evaluator="test_evaluator",
         query="test_query",

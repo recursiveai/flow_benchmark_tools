@@ -12,6 +12,8 @@ from .._llm._openai_gpt_model import GPT_3_5_TURBO, GPT_4_O, GPT_4_TURBO_PREVIEW
 from ._happy import HappyEvaluator
 from ._llm_judge import LLMJudgeEvaluator
 from ._llm_jury import LLMJuryEvaluator
+from ._regex_match import RegexMatchEvaluator
+from ._strict_match import StrictMatchEvaluator
 
 
 def get_evaluator(evaluator: str) -> BenchmarkEvaluator:
@@ -44,5 +46,9 @@ def get_evaluator(evaluator: str) -> BenchmarkEvaluator:
             return LLMJuryEvaluator(
                 judge_models=[GPT_3_5_TURBO, CLAUDE_3_HAIKU, GEMINI_1_5_FLASH]
             )
+        case "strict_match":
+            return StrictMatchEvaluator()
+        case "regex_match":
+            return RegexMatchEvaluator()
         case _:
             return LLMJudgeEvaluator(model=GPT_4_O)
