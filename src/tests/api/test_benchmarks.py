@@ -69,14 +69,20 @@ def benchmark_jsonl(benchmark_jsons):
             raise
 
 
-def test_error_on_no_reference_answer():
+def test_error_on_no_reference_answer_when_rag():
     with pytest.raises(ValueError):
-        BenchmarkCase(query="This is a test query")
+        BenchmarkCase(query="This is a test query", labels=["rag"])
+
+
+def test_no_error_on_no_reference_answer_when_not_rag():
+    BenchmarkCase(query="This is a test query")
 
 
 def test_reference_answer_from_file(reference_answer_file):
     benchmark = BenchmarkCase(
-        query="This is a test query", reference_answer_file=_TEST_REFERENCE_ANSWER_FILE
+        query="This is a test query",
+        reference_answer_file=_TEST_REFERENCE_ANSWER_FILE,
+        labels=["rag"],
     )
     assert benchmark.reference_answer == _TEST_REFERENCE_ANSWER
 
