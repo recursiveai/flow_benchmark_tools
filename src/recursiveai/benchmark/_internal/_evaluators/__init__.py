@@ -1,12 +1,5 @@
 # Copyright 2024 Recursive AI
 
-from recursiveai.benchmark._internal._evaluators._llm_criteria_judge import (
-    LLMCriteriaJudgeEvaluator,
-)
-from recursiveai.benchmark._internal._evaluators._llm_criteria_jury import (
-    LLMCriteriaJuryEvaluator,
-)
-
 from .._benchmark_evaluator import BenchmarkEvaluator
 from .._llm._anthropic_claude_model import (
     CLAUDE_3_5_SONNET,
@@ -17,6 +10,8 @@ from .._llm._azure_openai_gpt_model import AZURE_GPT
 from .._llm._google_gemini_model import GEMINI_1_5_FLASH, GEMINI_1_5_PRO
 from .._llm._openai_gpt_model import GPT_3_5_TURBO, GPT_4_O, GPT_4_TURBO_PREVIEW
 from ._happy import HappyEvaluator
+from ._llm_criteria_judge import LLMCriteriaJudgeEvaluator
+from ._llm_criteria_jury import LLMCriteriaJuryEvaluator
 from ._llm_judge import LLMJudgeEvaluator
 from ._llm_jury import LLMJuryEvaluator
 from ._regex_match import RegexMatchEvaluator
