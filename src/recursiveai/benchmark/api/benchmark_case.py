@@ -20,7 +20,9 @@ class BenchmarkCase(BaseModel):
 
     @model_validator(mode="after")
     def answer_validator(self):
-        if self.labels and "rag" in self.labels:
+        if self.labels and "criteria" in self.labels:
+            return self
+        else:
             if self.reference_answer is None and self.reference_answer_file is None:
                 raise ValueError(
                     "Both reference_answer and reference_answer_file are None"
