@@ -1,6 +1,7 @@
 # Copyright 2024 Recursive AI
 
 from .._benchmark_evaluator import BenchmarkEvaluator
+from .._criteria_evaluator import CriteriaEvaluator
 from .._llm._anthropic_claude_model import (
     CLAUDE_3_5_SONNET,
     CLAUDE_3_HAIKU,
@@ -49,6 +50,16 @@ def get_evaluator(evaluator: str) -> BenchmarkEvaluator:
                 judge_models=[GPT_3_5_TURBO, CLAUDE_3_HAIKU, GEMINI_1_5_FLASH]
             )
 
+        case "strict_match":
+            return StrictMatchEvaluator()
+        case "regex_match":
+            return RegexMatchEvaluator()
+        case _:
+            return LLMJudgeEvaluator(model=GPT_4_O)
+
+
+def get_criteria_evaluator(evaluator: str) -> CriteriaEvaluator:
+    match (evaluator):
         case "llm_criteria_judge_gpt-4o":
             return LLMCriteriaJudgeEvaluator(model=GPT_4_O)
         case "llm_criteria_jury_gpt_claude_gemini_high":
@@ -59,10 +70,5 @@ def get_evaluator(evaluator: str) -> BenchmarkEvaluator:
             return LLMCriteriaJuryEvaluator(
                 judge_models=[GPT_3_5_TURBO, CLAUDE_3_HAIKU, GEMINI_1_5_FLASH]
             )
-
-        case "strict_match":
-            return StrictMatchEvaluator()
-        case "regex_match":
-            return RegexMatchEvaluator()
         case _:
-            return LLMJudgeEvaluator(model=GPT_4_O)
+            return LLMCriteriaJudgeEvaluator(model=GPT_4_O)

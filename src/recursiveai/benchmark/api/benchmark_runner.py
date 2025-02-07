@@ -8,7 +8,7 @@ import os
 import time
 
 from .._internal._benchmark_output import BenchmarkOutput
-from .._internal._evaluators import get_evaluator
+from .._internal._evaluators import get_criteria_evaluator, get_evaluator
 from .._internal._run_output import RunOutput
 from .benchmark_agent import BenchmarkAgent
 from .benchmark_case import BenchmarkCase
@@ -182,6 +182,27 @@ class CriteriaBenchmarkRunner(BenchmarkRunner):
     Instead, we use a criteria-based evaluator to get subjective scores of the 'query'
     based on the 'criteria' defined in the 'extra' dict of the BenchmarkCase.
     """
+
+    def __init__(
+        self,
+        runs: list[BenchmarkRun] | BenchmarkRun,
+        evaluator: Evaluator = Evaluator.LLM_CRITERIA_JUDGE_GPT_4_0,
+        results_folder=_DEFAULT_RESULTS_FOLDER,
+        results_file="",
+        repeats: int = 1,
+        parallel: bool = False,
+        max_concurrency: int = _MAX_CONCURRENT_CASES,
+    ) -> None:
+        super().__init__(
+            runs=runs,
+            evaluator=evaluator,
+            results_folder=results_folder,
+            results_file=results_file,
+            repeats=repeats,
+            parallel=parallel,
+            max_concurrency=max_concurrency,
+        )
+        self._evaluator = get_criteria_evaluator(evaluator=evaluator)
 
     async def _execute_benchmark_case(
         self, agent: BenchmarkAgent, case: BenchmarkCase, idx: int, total: int
