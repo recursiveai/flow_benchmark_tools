@@ -20,11 +20,16 @@ class BenchmarkCase(BaseModel):
 
     @model_validator(mode="after")
     def answer_validator(self):
-        if self.reference_answer is None and self.reference_answer_file is None:
-            raise ValueError("Both reference_answer and reference_answer_file are None")
-        if self.reference_answer is None and self.reference_answer_file is not None:
-            with open(self.reference_answer_file, "r") as file:
-                self.reference_answer = file.read()
+        if self.labels and "criteria" in self.labels:
+            return self
+        else:
+            if self.reference_answer is None and self.reference_answer_file is None:
+                raise ValueError(
+                    "Both reference_answer and reference_answer_file are None"
+                )
+            if self.reference_answer is None and self.reference_answer_file is not None:
+                with open(self.reference_answer_file, "r") as file:
+                    self.reference_answer = file.read()
         return self
 
 

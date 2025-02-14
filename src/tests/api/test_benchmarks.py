@@ -74,9 +74,14 @@ def test_error_on_no_reference_answer():
         BenchmarkCase(query="This is a test query")
 
 
+def test_no_error_on_no_reference_answer_when_criteria():
+    BenchmarkCase(query="This is a test query", labels=["criteria"])
+
+
 def test_reference_answer_from_file(reference_answer_file):
     benchmark = BenchmarkCase(
-        query="This is a test query", reference_answer_file=_TEST_REFERENCE_ANSWER_FILE
+        query="This is a test query",
+        reference_answer_file=_TEST_REFERENCE_ANSWER_FILE,
     )
     assert benchmark.reference_answer == _TEST_REFERENCE_ANSWER
 
