@@ -6,12 +6,12 @@ Create and run LLM benchmarks.
 
 Just the library:
 ```sh
-pip install flow-benchmark-tools:1.1.0
+pip install flow-benchmark-tools:1.2.0
 ```
 
 Library + Example benchmarks (see below):
 ```sh
-pip install "flow-benchmark-tools[examples]:1.1.0"
+pip install "flow-benchmark-tools[examples]:1.2.0"
 ```
 
 ## Usage
@@ -58,5 +58,5 @@ The criteria benchmark cases are defined in [data/criteria_benchmark.jsonl](data
 
 This example follows a different application of the library:
 * define an agent implementing the [BenchmarkAgent](src/recursiveai/benchmark/api/benchmark_agent.py) interface. In this application, each case already has the output we want to evaluate, so we override the `run_benchmark_case` method to simply repackage each `BenchmarkCase` as `BenchmarkCaseResponse`.
-* create a set of quality benchmark cases, typically as a JSONL file such as [data/criteria_benchmark.jsonl](data/criteria_benchmark.jsonl). In this application, each case's "extra" dictionary includes a "criteria" string. 
+* create a set of quality benchmark cases, typically as a JSONL file such as [data/criteria_benchmark.jsonl](data/criteria_benchmark.jsonl). In this application, each case's "extra" dictionary includes a "criteria" string.
 * use a custom [CriteriaBenchmarkRunner](src/recursiveai/benchmark/api/benchmark_runner.py) which overrides the `_execute_benchmark_case` method, to run the benchmark using an evaluator that inherits from `CriteriaEvaluator`
