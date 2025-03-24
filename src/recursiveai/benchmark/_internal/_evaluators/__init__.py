@@ -70,5 +70,7 @@ def get_criteria_evaluator(evaluator: str) -> CriteriaEvaluator:
             return LLMCriteriaJuryEvaluator(
                 judge_models=[GPT_3_5_TURBO, CLAUDE_3_HAIKU, GEMINI_1_5_FLASH]
             )
+        case "llm_criteria_jury_gpt_gemini_high":
+            return LLMCriteriaJuryEvaluator(judge_models=[GPT_4_O, GEMINI_1_5_PRO])
         case _:
             return LLMCriteriaJudgeEvaluator(model=GPT_4_O)
