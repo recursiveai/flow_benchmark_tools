@@ -76,3 +76,4 @@ GPT_4_TURBO_PREVIEW = GPTX(
     name="gpt-4-turbo-preview", context_window=128000, output_window=4096
 )
 GPT_4_O = GPTX(name="gpt-4o", context_window=128000, output_window=4096)
+GPT_4_O_mini = GPTX(name="gpt-4o-mini", context_window=128000, output_window=4096)

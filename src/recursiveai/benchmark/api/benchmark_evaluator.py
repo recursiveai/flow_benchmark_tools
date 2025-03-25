@@ -20,6 +20,7 @@ class Evaluator(str, Enum):
     LLM_JURY_GPT_CLAUDE_GEMINI_LOW = "llm_jury_gpt_claude_gemini_low"
 
     LLM_CRITERIA_JUDGE_GPT_4_0 = "llm_criteria_judge_gpt-4o"
+    LLM_CRITERIA_JUDGE_GPT_4_O_MINI = "llm_criteria_judge_gpt-4o_mini"
 
     LLM_CRITERIA_JURY_GPT_GEMINI_HIGH = "llm_criteria_jury_gpt_gemini_high"
 

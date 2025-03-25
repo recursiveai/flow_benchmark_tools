@@ -9,7 +9,7 @@ from .._llm._anthropic_claude_model import (
 )
 from .._llm._azure_openai_gpt_model import AZURE_GPT
 from .._llm._google_gemini_model import GEMINI_1_5_FLASH, GEMINI_1_5_PRO
-from .._llm._openai_gpt_model import GPT_3_5_TURBO, GPT_4_O, GPT_4_TURBO_PREVIEW
+from .._llm._openai_gpt_model import GPT_3_5_TURBO, GPT_4_O, GPT_4_TURBO_PREVIEW, GPT_4_O_mini
 from ._happy import HappyEvaluator
 from ._llm_criteria_judge import LLMCriteriaJudgeEvaluator
 from ._llm_criteria_jury import LLMCriteriaJuryEvaluator
@@ -62,6 +62,8 @@ def get_criteria_evaluator(evaluator: str) -> CriteriaEvaluator:
     match (evaluator):
         case "llm_criteria_judge_gpt-4o":
             return LLMCriteriaJudgeEvaluator(model=GPT_4_O)
+        case "llm_criteria_judge_gpt-4o_mini":
+            return LLMCriteriaJudgeEvaluator(model=GPT_4_O_mini)
         case "llm_criteria_jury_gpt_claude_gemini_high":
             return LLMCriteriaJuryEvaluator(
                 judge_models=[GPT_4_O, CLAUDE_3_5_SONNET, GEMINI_1_5_PRO]
