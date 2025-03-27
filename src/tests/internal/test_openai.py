@@ -10,6 +10,7 @@ from recursiveai.benchmark._internal._llm._openai_gpt_model import (
     GPT_3_5_TURBO,
     GPT_4_O,
     GPT_4_TURBO_PREVIEW,
+    GPT_4_O_MINI,
     GPTX,
 )
 
@@ -39,6 +40,10 @@ def test_gpt_4o_context_window():
     assert GPT_4_O.context_window == 128000
 
 
+def test_gpt_4o_mini_context_window():
+    assert GPT_4_O_MINI.context_window == 128000
+
+
 def test_no_output_window(mock_model: GPTX):
     assert mock_model.context_window == mock_model.output_window
 
@@ -47,8 +52,8 @@ def test_no_output_window(mock_model: GPTX):
 @pytest.mark.flaky(reruns=2)
 @pytest.mark.parametrize(
     argnames="model",
-    argvalues=[GPT_3_5_TURBO, GPT_4_TURBO_PREVIEW, GPT_4_O],
-    ids=[GPT_3_5_TURBO.name, GPT_4_TURBO_PREVIEW.name, GPT_4_O.name],
+    argvalues=[GPT_3_5_TURBO, GPT_4_TURBO_PREVIEW, GPT_4_O, GPT_4_O_MINI],
+    ids=[GPT_3_5_TURBO.name, GPT_4_TURBO_PREVIEW.name, GPT_4_O.name, GPT_4_O_MINI.name],
 )
 async def test_async_chat_completion_success(model: GPTX):
     chat = [
