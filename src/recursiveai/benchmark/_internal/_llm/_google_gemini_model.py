@@ -111,3 +111,6 @@ GEMINI_1_5_FLASH = GoogleGemini(
 GEMINI_1_5_PRO = GoogleGemini(
     name="gemini-1.5-pro", context_window=1048576, output_window=8192
 )
+GEMINI_2_0_FLASH = GoogleGemini(
+    name="gemini-2.0-flash", context_window=1048576, output_window=8192
+)
