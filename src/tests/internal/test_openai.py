@@ -9,8 +9,8 @@ from recursiveai.benchmark._internal._llm._llm_model import ChatMessage
 from recursiveai.benchmark._internal._llm._openai_gpt_model import (
     GPT_3_5_TURBO,
     GPT_4_O,
-    GPT_4_TURBO_PREVIEW,
     GPT_4_O_MINI,
+    GPT_4_TURBO_PREVIEW,
     GPTX,
 )
 

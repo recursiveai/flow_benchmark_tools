@@ -6,12 +6,12 @@ Create and run LLM benchmarks.
 
 Just the library:
 ```sh
-pip install flow-benchmark-tools:1.3.0
+pip install flow-benchmark-tools:1.4.0
 ```
 
 Library + Example benchmarks (see below):
 ```sh
-pip install "flow-benchmark-tools[examples]:1.3.0"
+pip install "flow-benchmark-tools[examples]:1.4.0"
 ```
 
 ## Usage

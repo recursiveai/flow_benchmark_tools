@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "flow-benchmark-tools"
-version = "1.3.0"
+version = "1.4.0"
 description = "A library containing LLM benchmarking tools"
 readme = "README.md"
 requires-python=">=3.8,<3.12"
