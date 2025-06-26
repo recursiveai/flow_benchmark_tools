@@ -1,7 +1,8 @@
 # LangChain
-langchain==0.2.2
-langchain-openai==0.1.8
-langchain-community==0.2.3
+langchain==0.3.25
+langchain-community==0.3.24
+langchain-openai==0.3.19
+langchain-google-genai==2.0.10
 pypdf==4.2.0
 docx2txt==0.8
 faiss-cpu==1.7.4

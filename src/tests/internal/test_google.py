@@ -8,6 +8,7 @@ import pytest
 from recursiveai.benchmark._internal._llm._google_gemini_model import (
     GEMINI_1_5_FLASH,
     GEMINI_1_5_PRO,
+    GEMINI_2_0_FLASH,
     GoogleGemini,
 )
 from recursiveai.benchmark._internal._llm._llm_model import ChatMessage
@@ -42,8 +43,8 @@ def test_no_output_window(mock_model: GoogleGemini):
 @pytest.mark.flaky(reruns=2)
 @pytest.mark.parametrize(
     argnames="model",
-    argvalues=[GEMINI_1_5_FLASH, GEMINI_1_5_PRO],
-    ids=[GEMINI_1_5_FLASH.name, GEMINI_1_5_PRO.name],
+    argvalues=[GEMINI_1_5_FLASH, GEMINI_1_5_PRO, GEMINI_2_0_FLASH],
+    ids=[GEMINI_1_5_FLASH.name, GEMINI_1_5_PRO.name, GEMINI_2_0_FLASH.name],
 )
 async def test_async_chat_completion_success(model: GoogleGemini):
     chat = [
