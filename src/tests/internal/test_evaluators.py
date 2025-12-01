@@ -135,6 +135,24 @@ def test_get_gpt_4_o_evaluator():
     assert evaluator._model.name == "gpt-4o"
 
 
+def test_get_gpt_4_1_evaluator():
+    evaluator = get_evaluator(Evaluator.LLM_JUDGE_GPT_4_1)
+    assert isinstance(evaluator, LLMJudgeEvaluator)
+    assert evaluator._model.name == "gpt-4.1"
+
+
+def test_get_gpt_4_1_mini_evaluator():
+    evaluator = get_evaluator(Evaluator.LLM_JUDGE_GPT_4_1_MINI)
+    assert isinstance(evaluator, LLMJudgeEvaluator)
+    assert evaluator._model.name == "gpt-4.1-mini"
+
+
+def test_get_gpt_4_1_nano_evaluator():
+    evaluator = get_evaluator(Evaluator.LLM_JUDGE_GPT_4_1_NANO)
+    assert isinstance(evaluator, LLMJudgeEvaluator)
+    assert evaluator._model.name == "gpt-4.1-nano"
+
+
 def test_get_claude_3_opus_evaluator():
     evaluator = get_evaluator(Evaluator.LLM_JUDGE_CLAUDE_3_OPUS)
     assert isinstance(evaluator, LLMJudgeEvaluator)
