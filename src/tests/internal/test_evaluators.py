@@ -183,6 +183,13 @@ def test_get_gemini_1_5_pro_evaluator():
     assert evaluator._model.name == "gemini-1.5-pro"
 
 
+def test_get_gpt_4_1_variants_evaluator():
+    evaluator = get_evaluator(Evaluator.LLM_JURY_GPT_4_1_VARIANTS)
+    assert isinstance(evaluator, LLMJuryEvaluator)
+    for judge in evaluator._judges:
+        assert isinstance(judge, LLMJudgeEvaluator)
+
+
 def test_get_gpt_claude_gemini_high_evaluator():
     evaluator = get_evaluator(Evaluator.LLM_JURY_GPT_CLAUDE_GEMINI_HIGH)
     assert isinstance(evaluator, LLMJuryEvaluator)

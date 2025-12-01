@@ -61,6 +61,8 @@ def get_evaluator(evaluator: str) -> BenchmarkEvaluator:
             return LLMJudgeEvaluator(model=GEMINI_2_0_FLASH)
         case "llm_judge_azure-gpt":
             return LLMJudgeEvaluator(model=AZURE_GPT)
+        case "llm_jury_gpt-4.1-variants":
+            return LLMJuryEvaluator(judge_models=[GPT_4_1, GPT_4_1_MINI, GPT_4_1_NANO])
         case "llm_jury_gpt_claude_gemini_high":
             return LLMJuryEvaluator(
                 judge_models=[GPT_4_O, CLAUDE_3_5_SONNET, GEMINI_1_5_PRO]
