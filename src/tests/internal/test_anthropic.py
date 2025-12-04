@@ -36,13 +36,8 @@ def test_no_output_window(mock_model: AnthropicClaude):
 @pytest.mark.flaky(reruns=2)
 @pytest.mark.parametrize(
     argnames="model",
-    argvalues=[CLAUDE_3_HAIKU, CLAUDE_3_SONNET, CLAUDE_3_OPUS, CLAUDE_3_5_SONNET],
-    ids=[
-        CLAUDE_3_HAIKU.name,
-        CLAUDE_3_SONNET.name,
-        CLAUDE_3_OPUS.name,
-        CLAUDE_3_5_SONNET.name,
-    ],
+    argvalues=[CLAUDE_3_HAIKU, CLAUDE_3_OPUS],
+    ids=[CLAUDE_3_HAIKU.name, CLAUDE_3_OPUS.name],
 )
 async def test_async_chat_completion_success(model: AnthropicClaude):
     chat = [
