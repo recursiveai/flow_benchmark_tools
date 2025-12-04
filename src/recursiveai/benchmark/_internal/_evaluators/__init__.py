@@ -15,6 +15,9 @@ from .._llm._google_gemini_model import (
 )
 from .._llm._openai_gpt_model import (
     GPT_3_5_TURBO,
+    GPT_4_1,
+    GPT_4_1_MINI,
+    GPT_4_1_NANO,
     GPT_4_O,
     GPT_4_O_MINI,
     GPT_4_TURBO_PREVIEW,
@@ -38,6 +41,12 @@ def get_evaluator(evaluator: str) -> BenchmarkEvaluator:
             return LLMJudgeEvaluator(model=GPT_4_TURBO_PREVIEW)
         case "llm_judge_gpt-4o":
             return LLMJudgeEvaluator(model=GPT_4_O)
+        case "llm_judge_gpt-4.1":
+            return LLMJudgeEvaluator(model=GPT_4_1)
+        case "llm_judge_gpt-4.1-mini":
+            return LLMJudgeEvaluator(model=GPT_4_1_MINI)
+        case "llm_judge_gpt-4.1-nano":
+            return LLMJudgeEvaluator(model=GPT_4_1_NANO)
         case "llm_judge_claude-3-opus":
             return LLMJudgeEvaluator(model=CLAUDE_3_OPUS)
         case "llm_judge_claude-3-5-sonnet":
@@ -52,6 +61,8 @@ def get_evaluator(evaluator: str) -> BenchmarkEvaluator:
             return LLMJudgeEvaluator(model=GEMINI_2_0_FLASH)
         case "llm_judge_azure-gpt":
             return LLMJudgeEvaluator(model=AZURE_GPT)
+        case "llm_jury_gpt-4.1-variants":
+            return LLMJuryEvaluator(judge_models=[GPT_4_1, GPT_4_1_MINI, GPT_4_1_NANO])
         case "llm_jury_gpt_claude_gemini_high":
             return LLMJuryEvaluator(
                 judge_models=[GPT_4_O, CLAUDE_3_5_SONNET, GEMINI_1_5_PRO]

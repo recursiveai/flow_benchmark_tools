@@ -9,6 +9,9 @@ class Evaluator(str, Enum):
     LLM_JUDGE_GPT_3_5_TURBO = "llm_judge_gpt-3.5-turbo"
     LLM_JUDGE_GPT_4_TURBO_PREVIEW = "llm_judge_gpt-4-turbo-preview"
     LLM_JUDGE_GPT_4_0 = "llm_judge_gpt-4o"
+    LLM_JUDGE_GPT_4_1 = "llm_judge_gpt-4.1"
+    LLM_JUDGE_GPT_4_1_MINI = "llm_judge_gpt-4.1-mini"
+    LLM_JUDGE_GPT_4_1_NANO = "llm_judge_gpt-4.1-nano"
     LLM_JUDGE_CLAUDE_3_OPUS = "llm_judge_claude-3-opus"
     LLM_JUDGE_CLAUDE_3_5_SONNET = "llm_judge_claude-3-5-sonnet"
     LLM_JUDGE_CLAUDE_3_HAIKU = "llm_judge_claude-3-haiku"
@@ -17,6 +20,7 @@ class Evaluator(str, Enum):
     LLM_JUDGE_GEMINI_2_0_FLASH = "llm_judge_gemini-2.0-flash"
     LLM_JUDGE_AZURE_GPT = "llm_judge_azure-gpt"
 
+    LLM_JURY_GPT_4_1_VARIANTS = "llm_jury_gpt-4.1-variants"
     LLM_JURY_GPT_CLAUDE_GEMINI_HIGH = "llm_jury_gpt_claude_gemini_high"
     LLM_JURY_GPT_CLAUDE_GEMINI_LOW = "llm_jury_gpt_claude_gemini_low"
 
