@@ -60,3 +60,15 @@ This example follows a different application of the library:
 * define an agent implementing the [BenchmarkAgent](src/recursiveai/benchmark/api/benchmark_agent.py) interface. In this application, each case already has the output we want to evaluate, so we override the `run_benchmark_case` method to simply repackage each `BenchmarkCase` as `BenchmarkCaseResponse`.
 * create a set of quality benchmark cases, typically as a JSONL file such as [data/criteria_benchmark.jsonl](data/criteria_benchmark.jsonl). In this application, each case's "extra" dictionary includes a "criteria" string.
 * use a custom [CriteriaBenchmarkRunner](src/recursiveai/benchmark/api/benchmark_runner.py) which overrides the `_execute_benchmark_case` method, to run the benchmark using an evaluator that inherits from `CriteriaEvaluator`
+
+# Maintainers
+
+Matt Whalley, [Machine Learning Engineer](https://github.com/orgs/recursiveai/people/MattWhalley)
+
+## Bug Reporting
+
+Please file a GitHub issue describing the desired behaviour and what actually happened
+
+## Pull Requests
+
+
