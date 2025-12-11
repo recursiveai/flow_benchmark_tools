@@ -63,7 +63,7 @@ This example follows a different application of the library:
 
 # Maintainers
 
-[Matt Whalley, Machine Learning Engineer](https://github.com/MattWhalley))
+[Matt Whalley, Machine Learning Engineer](https://github.com/MattWhalley)
 
 ## Bug Reporting
 
