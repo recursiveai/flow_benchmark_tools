@@ -30,7 +30,7 @@ bandit: ## Check securty smells with bandit
 style: black isort ## Run black and isort
 
 black: ## Auto-format python code using black
-	python -m black src
+	python -m black src  --target-version='py311'
 
 isort: ## Auto-format python code using isort
 	python -m isort src
