@@ -48,7 +48,7 @@ class GoogleGemini(LLMModel):
         max_tokens = kwargs.get("max_tokens", self._output_window)
         timeout = kwargs.get("timeout", 60)
 
-        (system, messages) = await self._convert_chat_to_messages(chat)
+        system, messages = await self._convert_chat_to_messages(chat)
 
         config = GenerationConfig(
             temperature=temperature,
